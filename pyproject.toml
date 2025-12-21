@@ -1,0 +1,17 @@
+[project]
+name = "data-flight-pipeline"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.12.5",
+    "pyspark==3.5.0",
+    "requests>=2.32.5",
+    "dbt-core>=1.8.0",
+    "dbt-postgres>=1.8.0",
+    "apache-airflow-providers-apache-spark==5.1.1",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.1.0",
+]
