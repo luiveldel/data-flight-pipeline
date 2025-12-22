@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 
 from pyspark.sql import SparkSession
 from spark_jobs.shared.config import Config, AviationStackParams
-from spark_jobs._etl import AviationStackETL
+from spark_jobs.aviationstack._etl import AviationStackETL
 
 
 def verify_etl():

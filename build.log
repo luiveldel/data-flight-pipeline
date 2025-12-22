@@ -1,0 +1,372 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 863B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/apache/airflow:2.10.3-python3.10
+#2 DONE 0.4s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/apache/airflow:2.10.3-python3.10@sha256:3b91fe40009b7cb3487fbe7d07d98b785bafe6dde5ee668b07373bffe47d933d
+#4 DONE 0.0s
+
+#5 [2/5] RUN apt-get update   && apt-get install -y --no-install-recommends          openjdk-17-jre-headless   && apt-get autoremove -yqq --purge   && apt-get clean   && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [3/5] RUN mkdir -p /data/raw && chown -R airflow:0 /data
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 2.13kB done
+#7 DONE 0.0s
+
+#8 [4/5] RUN pip install --no-cache-dir "apache-airflow==2.10.3"     --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.10.txt"     pydantic==2.9.2 pyspark==3.5.3 requests==2.32.3     "dbt-core>=1.8.0" "dbt-postgres>=1.8.0"     apache-airflow-providers-apache-spark==4.11.2 apache-airflow-providers-amazon typer
+#8 2.348 Requirement already satisfied: apache-airflow==2.10.3 in /home/airflow/.local/lib/python3.10/site-packages (2.10.3)
+#8 2.348 Requirement already satisfied: pydantic==2.9.2 in /home/airflow/.local/lib/python3.10/site-packages (2.9.2)
+#8 2.445 Collecting pyspark==3.5.3
+#8 2.539   Downloading pyspark-3.5.3.tar.gz (317.3 MB)
+#8 31.40      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 317.3/317.3 MB 10.6 MB/s eta 0:00:00
+#8 37.13   Preparing metadata (setup.py): started
+#8 38.70   Preparing metadata (setup.py): finished with status 'done'
+#8 38.70 Requirement already satisfied: requests==2.32.3 in /home/airflow/.local/lib/python3.10/site-packages (2.32.3)
+#8 38.84 Collecting dbt-core>=1.8.0
+#8 38.85   Downloading dbt_core-1.10.17-py3-none-any.whl.metadata (4.2 kB)
+#8 39.01 Collecting dbt-postgres>=1.8.0
+#8 39.03   Downloading dbt_postgres-1.9.1-py3-none-any.whl.metadata (3.8 kB)
+#8 39.10 Collecting apache-airflow-providers-apache-spark==4.11.2
+#8 39.11   Downloading apache_airflow_providers_apache_spark-4.11.2-py3-none-any.whl.metadata (6.1 kB)
+#8 39.12 Requirement already satisfied: apache-airflow-providers-amazon in /home/airflow/.local/lib/python3.10/site-packages (9.0.0)
+#8 39.16 Collecting typer
+#8 39.17   Downloading typer-0.20.1-py3-none-any.whl.metadata (16 kB)
+#8 40.02 Requirement already satisfied: alembic<2.0,>=1.13.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.14.0)
+#8 40.02 Requirement already satisfied: argcomplete>=1.10 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.5.1)
+#8 40.02 Requirement already satisfied: asgiref>=2.3.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.8.1)
+#8 40.02 Requirement already satisfied: attrs>=22.1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (24.2.0)
+#8 40.02 Requirement already satisfied: blinker>=1.6.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.8.2)
+#8 40.03 Requirement already satisfied: colorlog>=6.8.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (6.9.0)
+#8 40.03 Requirement already satisfied: configupdater>=3.1.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.2)
+#8 40.03 Requirement already satisfied: connexion<3.0,>=2.14.2 in /home/airflow/.local/lib/python3.10/site-packages (from connexion[flask]<3.0,>=2.14.2->apache-airflow==2.10.3) (2.14.2)
+#8 40.03 Requirement already satisfied: cron-descriptor>=1.2.24 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.4.5)
+#8 40.03 Requirement already satisfied: croniter>=2.0.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (5.0.1)
+#8 40.03 Requirement already satisfied: cryptography>=41.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (42.0.8)
+#8 40.03 Requirement already satisfied: deprecated>=1.2.13 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.2.14)
+#8 40.03 Requirement already satisfied: dill>=0.2.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.3.1.1)
+#8 40.03 Requirement already satisfied: flask-caching>=2.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.3.0)
+#8 40.03 Requirement already satisfied: flask-session<0.6,>=0.4.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.5.0)
+#8 40.04 Requirement already satisfied: flask-wtf>=1.1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.2.2)
+#8 40.04 Requirement already satisfied: flask<2.3,>=2.2.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.2.5)
+#8 40.04 Requirement already satisfied: fsspec>=2023.10.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2024.10.0)
+#8 40.04 Requirement already satisfied: google-re2>=1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.1.20240702)
+#8 40.04 Requirement already satisfied: gunicorn>=20.1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (23.0.0)
+#8 40.04 Requirement already satisfied: httpx>=0.25.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.27.0)
+#8 40.04 Requirement already satisfied: importlib_metadata>=6.5 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (6.11.0)
+#8 40.04 Requirement already satisfied: itsdangerous>=2.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.2.0)
+#8 40.04 Requirement already satisfied: jinja2>=3.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.1.4)
+#8 40.04 Requirement already satisfied: jsonschema>=4.18.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (4.23.0)
+#8 40.04 Requirement already satisfied: lazy-object-proxy>=1.2.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.10.0)
+#8 40.04 Requirement already satisfied: linkify-it-py>=2.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.0.3)
+#8 40.04 Requirement already satisfied: lockfile>=0.12.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.12.2)
+#8 40.04 Requirement already satisfied: markdown-it-py>=2.1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.0.0)
+#8 40.04 Requirement already satisfied: markupsafe>=1.1.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.0.2)
+#8 40.04 Requirement already satisfied: marshmallow-oneofschema>=2.0.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.1.1)
+#8 40.04 Requirement already satisfied: mdit-py-plugins>=0.3.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.4.2)
+#8 40.04 Requirement already satisfied: methodtools>=0.4.7 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.4.7)
+#8 40.05 Requirement already satisfied: opentelemetry-api>=1.15.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.27.0)
+#8 40.05 Requirement already satisfied: opentelemetry-exporter-otlp>=1.15.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.27.0)
+#8 40.05 Requirement already satisfied: packaging>=23.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (24.1)
+#8 40.05 Requirement already satisfied: pathspec>=0.9.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.12.1)
+#8 40.05 Requirement already satisfied: pendulum<4.0,>=2.1.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.0.0)
+#8 40.05 Requirement already satisfied: pluggy>=1.5.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.5.0)
+#8 40.05 Requirement already satisfied: psutil>=5.8.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (6.1.0)
+#8 40.05 Requirement already satisfied: pygments>=2.0.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.18.0)
+#8 40.05 Requirement already satisfied: pyjwt>=2.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.9.0)
+#8 40.05 Requirement already satisfied: python-daemon>=3.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.1.0)
+#8 40.05 Requirement already satisfied: python-dateutil>=2.7.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.9.0.post0)
+#8 40.05 Requirement already satisfied: python-nvd3>=0.15.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.16.0)
+#8 40.05 Requirement already satisfied: python-slugify>=5.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (8.0.4)
+#8 40.05 Requirement already satisfied: requests-toolbelt>=0.4.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.0.0)
+#8 40.05 Requirement already satisfied: rfc3339-validator>=0.1.4 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.1.4)
+#8 40.05 Requirement already satisfied: rich-argparse>=1.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.6.0)
+#8 40.05 Requirement already satisfied: rich>=12.4.4 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (13.9.4)
+#8 40.05 Requirement already satisfied: setproctitle>=1.3.3 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.3.3)
+#8 40.05 Requirement already satisfied: sqlalchemy<2.0,>=1.4.36 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.4.54)
+#8 40.05 Requirement already satisfied: sqlalchemy-jsonfield>=1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.0.2)
+#8 40.06 Requirement already satisfied: tabulate>=0.7.5 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.9.0)
+#8 40.06 Requirement already satisfied: tenacity!=8.2.0,>=8.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (8.5.0)
+#8 40.06 Requirement already satisfied: termcolor>=1.1.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.5.0)
+#8 40.06 Requirement already satisfied: universal-pathlib!=0.2.4,>=0.2.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (0.2.5)
+#8 40.06 Requirement already satisfied: werkzeug<3,>=2.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (2.2.3)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-common-compat in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.2.1)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-common-io in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.4.2)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-common-sql in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.19.0)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-fab>=1.0.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.5.0)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-ftp in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.11.1)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-http in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (4.13.2)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-imap in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.7.0)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-smtp in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (1.8.0)
+#8 40.06 Requirement already satisfied: apache-airflow-providers-sqlite in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow==2.10.3) (3.9.0)
+#8 40.07 Requirement already satisfied: annotated-types>=0.6.0 in /home/airflow/.local/lib/python3.10/site-packages (from pydantic==2.9.2) (0.7.0)
+#8 40.07 Requirement already satisfied: pydantic-core==2.23.4 in /home/airflow/.local/lib/python3.10/site-packages (from pydantic==2.9.2) (2.23.4)
+#8 40.07 Requirement already satisfied: typing-extensions>=4.6.1 in /home/airflow/.local/lib/python3.10/site-packages (from pydantic==2.9.2) (4.12.2)
+#8 40.10 Collecting py4j==0.10.9.7 (from pyspark==3.5.3)
+#8 40.11   Downloading py4j-0.10.9.7-py2.py3-none-any.whl.metadata (1.5 kB)
+#8 40.12 Requirement already satisfied: charset-normalizer<4,>=2 in /home/airflow/.local/lib/python3.10/site-packages (from requests==2.32.3) (3.4.0)
+#8 40.12 Requirement already satisfied: idna<4,>=2.5 in /home/airflow/.local/lib/python3.10/site-packages (from requests==2.32.3) (3.10)
+#8 40.12 Requirement already satisfied: urllib3<3,>=1.21.1 in /home/airflow/.local/lib/python3.10/site-packages (from requests==2.32.3) (2.2.3)
+#8 40.13 Requirement already satisfied: certifi>=2017.4.17 in /home/airflow/.local/lib/python3.10/site-packages (from requests==2.32.3) (2024.8.30)
+#8 40.13 Requirement already satisfied: grpcio-status>=1.59.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-apache-spark==4.11.2) (1.62.3)
+#8 40.18 Collecting agate<1.10,>=1.7.0 (from dbt-core>=1.8.0)
+#8 40.19   Downloading agate-1.9.1-py2.py3-none-any.whl.metadata (3.2 kB)
+#8 40.25 Collecting mashumaro<3.15,>=3.9 (from mashumaro[msgpack]<3.15,>=3.9->dbt-core>=1.8.0)
+#8 40.27   Downloading mashumaro-3.14-py3-none-any.whl.metadata (114 kB)
+#8 40.28 Requirement already satisfied: click<9.0,>=8.0.2 in /home/airflow/.local/lib/python3.10/site-packages (from dbt-core>=1.8.0) (8.1.7)
+#8 40.32 Collecting networkx<4.0,>=2.3 (from dbt-core>=1.8.0)
+#8 40.34   Downloading networkx-3.4.2-py3-none-any.whl.metadata (6.3 kB)
+#8 40.64 INFO: pip is looking at multiple versions of dbt-core to determine which version is compatible with other requirements. This could take a while.
+#8 40.64 Collecting dbt-core>=1.8.0
+#8 40.66   Downloading dbt_core-1.10.16-py3-none-any.whl.metadata (4.2 kB)
+#8 40.68   Downloading dbt_core-1.10.15-py3-none-any.whl.metadata (4.2 kB)
+#8 40.70   Downloading dbt_core-1.10.13-py3-none-any.whl.metadata (4.2 kB)
+#8 40.73   Downloading dbt_core-1.10.11-py3-none-any.whl.metadata (4.2 kB)
+#8 40.77   Downloading dbt_core-1.10.10-py3-none-any.whl.metadata (4.2 kB)
+#8 40.79   Downloading dbt_core-1.10.9-py3-none-any.whl.metadata (4.2 kB)
+#8 40.81   Downloading dbt_core-1.10.8-py3-none-any.whl.metadata (4.2 kB)
+#8 40.83 INFO: pip is still looking at multiple versions of dbt-core to determine which version is compatible with other requirements. This could take a while.
+#8 40.85   Downloading dbt_core-1.10.7-py3-none-any.whl.metadata (4.2 kB)
+#8 40.87   Downloading dbt_core-1.10.6-py3-none-any.whl.metadata (4.2 kB)
+#8 40.89   Downloading dbt_core-1.10.5-py3-none-any.whl.metadata (4.2 kB)
+#8 40.91   Downloading dbt_core-1.10.4-py3-none-any.whl.metadata (4.2 kB)
+#8 40.94   Downloading dbt_core-1.10.3-py3-none-any.whl.metadata (4.2 kB)
+#8 40.95 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#8 40.96   Downloading dbt_core-1.10.2-py3-none-any.whl.metadata (4.2 kB)
+#8 40.99   Downloading dbt_core-1.10.1-py3-none-any.whl.metadata (4.2 kB)
+#8 41.01   Downloading dbt_core-1.10.0-py3-none-any.whl.metadata (4.2 kB)
+#8 41.03   Downloading dbt_core-1.9.10-py3-none-any.whl.metadata (4.0 kB)
+#8 41.06   Downloading dbt_core-1.9.9-py3-none-any.whl.metadata (4.0 kB)
+#8 41.08   Downloading dbt_core-1.9.8-py3-none-any.whl.metadata (4.0 kB)
+#8 41.14   Downloading dbt_core-1.9.7-py3-none-any.whl.metadata (4.0 kB)
+#8 41.16   Downloading dbt_core-1.9.6-py3-none-any.whl.metadata (4.0 kB)
+#8 41.19   Downloading dbt_core-1.9.5-py3-none-any.whl.metadata (4.0 kB)
+#8 41.22   Downloading dbt_core-1.9.4-py3-none-any.whl.metadata (4.0 kB)
+#8 41.25   Downloading dbt_core-1.9.3-py3-none-any.whl.metadata (4.0 kB)
+#8 41.27   Downloading dbt_core-1.9.2-py3-none-any.whl.metadata (4.0 kB)
+#8 41.29   Downloading dbt_core-1.9.1-py3-none-any.whl.metadata (3.8 kB)
+#8 41.32   Downloading dbt_core-1.9.0-py3-none-any.whl.metadata (3.8 kB)
+#8 41.34   Downloading dbt_core-1.8.9-py3-none-any.whl.metadata (3.9 kB)
+#8 41.35 Collecting mashumaro<4.0,>=3.9 (from mashumaro[msgpack]<4.0,>=3.9->dbt-core>=1.8.0)
+#8 41.37   Downloading mashumaro-3.17-py3-none-any.whl.metadata (118 kB)
+#8 41.50 Collecting logbook<1.6,>=1.5 (from dbt-core>=1.8.0)
+#8 41.52   Downloading Logbook-1.5.3.tar.gz (85 kB)
+#8 41.54   Preparing metadata (setup.py): started
+#8 42.59   Preparing metadata (setup.py): finished with status 'done'
+#8 42.59 Collecting dbt-core>=1.8.0
+#8 42.61   Downloading dbt_core-1.8.8-py3-none-any.whl.metadata (3.9 kB)
+#8 42.62 Requirement already satisfied: protobuf<5,>=4.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from dbt-core>=1.8.0) (4.25.5)
+#8 42.62 Requirement already satisfied: sqlparse<0.6.0,>=0.5.0 in /home/airflow/.local/lib/python3.10/site-packages (from dbt-core>=1.8.0) (0.5.1)
+#8 42.66 Collecting dbt-extractor<=0.6,>=0.5.0 (from dbt-core>=1.8.0)
+#8 42.67   Downloading dbt_extractor-0.6.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.6 kB)
+#8 42.69 Collecting minimal-snowplow-tracker<0.1,>=0.0.2 (from dbt-core>=1.8.0)
+#8 42.71   Downloading minimal-snowplow-tracker-0.0.2.tar.gz (12 kB)
+#8 42.72   Preparing metadata (setup.py): started
+#8 43.68   Preparing metadata (setup.py): finished with status 'done'
+#8 43.72 Collecting dbt-semantic-interfaces<0.6,>=0.5.1 (from dbt-core>=1.8.0)
+#8 43.73   Downloading dbt_semantic_interfaces-0.5.1-py3-none-any.whl.metadata (2.6 kB)
+#8 43.86 Collecting dbt-common<1.11.0,>=1.0.4 (from dbt-core>=1.8.0)
+#8 43.88   Downloading dbt_common-1.10.0-py3-none-any.whl.metadata (5.3 kB)
+#8 43.93 Collecting dbt-adapters<1.7.1,>=1.1.1 (from dbt-core>=1.8.0)
+#8 43.94   Downloading dbt_adapters-1.7.0-py3-none-any.whl.metadata (2.5 kB)
+#8 43.95 Requirement already satisfied: pytz>=2015.7 in /home/airflow/.local/lib/python3.10/site-packages (from dbt-core>=1.8.0) (2024.2)
+#8 43.95 Requirement already satisfied: pyyaml>=6.0 in /home/airflow/.local/lib/python3.10/site-packages (from dbt-core>=1.8.0) (6.0.2)
+#8 43.97 Collecting daff>=1.3.46 (from dbt-core>=1.8.0)
+#8 43.98   Downloading daff-1.4.2-py3-none-any.whl.metadata (10 kB)
+#8 44.02 Requirement already satisfied: psycopg2-binary<3.0,>=2.9 in /home/airflow/.local/lib/python3.10/site-packages (from dbt-postgres>=1.8.0) (2.9.10)
+#8 44.04 Requirement already satisfied: PyAthena>=3.0.10 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (3.9.0)
+#8 44.04 Requirement already satisfied: boto3>=1.34.90 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (1.35.36)
+#8 44.04 Requirement already satisfied: botocore>=1.34.90 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (1.35.36)
+#8 44.04 Requirement already satisfied: inflection>=0.5.1 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (0.5.1)
+#8 44.04 Requirement already satisfied: jmespath>=0.7.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (0.10.0)
+#8 44.04 Requirement already satisfied: jsonpath_ng>=1.5.3 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (1.7.0)
+#8 44.04 Requirement already satisfied: python3-saml>=1.16.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (1.16.0)
+#8 44.04 Requirement already satisfied: redshift_connector>=2.0.918 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (2.1.3)
+#8 44.04 Requirement already satisfied: sqlalchemy_redshift>=0.8.6 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (0.8.14)
+#8 44.04 Requirement already satisfied: watchtower!=3.3.0,<4,>=3.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-amazon) (3.3.1)
+#8 44.07 Collecting shellingham>=1.3.0 (from typer)
+#8 44.08   Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+#8 44.09 Requirement already satisfied: Babel>=2.0 in /home/airflow/.local/lib/python3.10/site-packages (from agate<1.10,>=1.7.0->dbt-core>=1.8.0) (2.16.0)
+#8 44.09 Requirement already satisfied: isodate>=0.5.4 in /home/airflow/.local/lib/python3.10/site-packages (from agate<1.10,>=1.7.0->dbt-core>=1.8.0) (0.7.2)
+#8 44.11 Collecting leather>=0.3.2 (from agate<1.10,>=1.7.0->dbt-core>=1.8.0)
+#8 44.13   Downloading leather-0.4.1-py3-none-any.whl.metadata (3.0 kB)
+#8 44.15 Collecting parsedatetime!=2.5,>=2.1 (from agate<1.10,>=1.7.0->dbt-core>=1.8.0)
+#8 44.16   Downloading parsedatetime-2.6-py3-none-any.whl.metadata (4.7 kB)
+#8 44.19 Collecting pytimeparse>=1.1.5 (from agate<1.10,>=1.7.0->dbt-core>=1.8.0)
+#8 44.20   Downloading pytimeparse-1.1.8-py2.py3-none-any.whl.metadata (3.4 kB)
+#8 44.21 Requirement already satisfied: Mako in /home/airflow/.local/lib/python3.10/site-packages (from alembic<2.0,>=1.13.1->apache-airflow==2.10.3) (1.3.6)
+#8 44.22 Requirement already satisfied: more-itertools>=9.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-common-sql->apache-airflow==2.10.3) (10.5.0)
+#8 44.23 Requirement already satisfied: flask-appbuilder==4.5.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (4.5.2)
+#8 44.23 Requirement already satisfied: flask-login>=0.6.2 in /home/airflow/.local/lib/python3.10/site-packages (from apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (0.6.3)
+#8 44.24 Requirement already satisfied: apispec<7,>=6.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from apispec[yaml]<7,>=6.0.0->flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (6.7.1)
+#8 44.24 Requirement already satisfied: colorama<1,>=0.3.9 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (0.4.6)
+#8 44.24 Requirement already satisfied: email-validator>=1.0.5 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (2.2.0)
+#8 44.24 Requirement already satisfied: Flask-Babel<3,>=1 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (2.0.0)
+#8 44.24 Requirement already satisfied: Flask-Limiter<4,>3 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (3.8.0)
+#8 44.24 Requirement already satisfied: Flask-SQLAlchemy<3,>=2.4 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (2.5.1)
+#8 44.25 Requirement already satisfied: Flask-JWT-Extended<5.0.0,>=4.0.0 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (4.6.0)
+#8 44.25 Requirement already satisfied: marshmallow<4,>=3.18.0 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (3.23.1)
+#8 44.25 Requirement already satisfied: marshmallow-sqlalchemy<0.29.0,>=0.22.0 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (0.28.2)
+#8 44.25 Requirement already satisfied: prison<1.0.0,>=0.2.1 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (0.2.1)
+#8 44.25 Requirement already satisfied: sqlalchemy-utils<1,>=0.32.21 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (0.41.2)
+#8 44.25 Requirement already satisfied: WTForms<4 in /home/airflow/.local/lib/python3.10/site-packages (from flask-appbuilder==4.5.2->apache-airflow-providers-fab>=1.0.2->apache-airflow==2.10.3) (3.2.1)
+#8 44.28 Requirement already satisfied: s3transfer<0.11.0,>=0.10.0 in /home/airflow/.local/lib/python3.10/site-packages (from boto3>=1.34.90->apache-airflow-providers-amazon) (0.10.3)
+#8 44.31 Requirement already satisfied: clickclick<21,>=1.2 in /home/airflow/.local/lib/python3.10/site-packages (from connexion<3.0,>=2.14.2->connexion[flask]<3.0,>=2.14.2->apache-airflow==2.10.3) (20.10.2)
+#8 44.33 Requirement already satisfied: cffi>=1.12 in /home/airflow/.local/lib/python3.10/site-packages (from cryptography>=41.0.0->apache-airflow==2.10.3) (1.17.1)
+#8 44.40 Collecting deepdiff<8.0,>=7.0 (from dbt-common<1.11.0,>=1.0.4->dbt-core>=1.8.0)
+#8 44.41   Downloading deepdiff-7.0.1-py3-none-any.whl.metadata (6.8 kB)
+#8 44.44 INFO: pip is looking at multiple versions of dbt-common to determine which version is compatible with other requirements. This could take a while.
+#8 44.44 Collecting dbt-common<1.11.0,>=1.0.4 (from dbt-core>=1.8.0)
+#8 44.45   Downloading dbt_common-1.9.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.48   Downloading dbt_common-1.8.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.50 Collecting agate<1.10,>=1.7.0 (from dbt-core>=1.8.0)
+#8 44.51   Downloading agate-1.9.0-py2.py3-none-any.whl.metadata (3.2 kB)
+#8 44.53 Collecting dbt-common<1.11.0,>=1.0.4 (from dbt-core>=1.8.0)
+#8 44.54   Downloading dbt_common-1.7.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.57   Downloading dbt_common-1.6.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.59 INFO: pip is still looking at multiple versions of dbt-common to determine which version is compatible with other requirements. This could take a while.
+#8 44.60   Downloading dbt_common-1.5.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.63   Downloading dbt_common-1.4.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.66   Downloading dbt_common-1.3.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.68   Downloading dbt_common-1.2.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.70   Downloading dbt_common-1.1.0-py3-none-any.whl.metadata (5.3 kB)
+#8 44.72 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#8 44.73   Downloading dbt_common-1.0.4-py3-none-any.whl.metadata (5.2 kB)
+#8 44.74 Collecting agate<1.10,>=1.7.0 (from dbt-core>=1.8.0)
+#8 44.76   Downloading agate-1.8.0-py2.py3-none-any.whl.metadata (3.2 kB)
+#8 44.81   Downloading agate-1.7.1-py2.py3-none-any.whl.metadata (3.1 kB)
+#8 44.84   Downloading agate-1.7.0-py2.py3-none-any.whl.metadata (3.0 kB)
+#8 44.86 Collecting parsedatetime!=2.5,!=2.6,>=2.1 (from agate<1.10,>=1.7.0->dbt-core>=1.8.0)
+#8 44.87   Downloading parsedatetime-2.4.tar.gz (58 kB)
+#8 44.90   Preparing metadata (setup.py): started
+#8 45.81   Preparing metadata (setup.py): finished with status 'done'
+#8 45.82 Collecting dbt-postgres>=1.8.0
+#8 45.84   Downloading dbt_postgres-1.9.0-py3-none-any.whl.metadata (4.1 kB)
+#8 45.97 Collecting dbt-core>=1.8.0
+#8 45.98   Downloading dbt_core-1.8.7-py3-none-any.whl.metadata (3.9 kB)
+#8 45.99 Collecting dbt-common<2.0,>=1.0.4 (from dbt-core>=1.8.0)
+#8 46.01   Downloading dbt_common-1.37.2-py3-none-any.whl.metadata (4.9 kB)
+#8 46.03 Collecting dbt-adapters<2.0,>=1.1.1 (from dbt-core>=1.8.0)
+#8 46.04   Downloading dbt_adapters-1.22.2-py3-none-any.whl.metadata (4.5 kB)
+#8 46.08 Collecting dbt-protos<2.0.0,>=1.0.410 (from dbt-common<2.0,>=1.0.4->dbt-core>=1.8.0)
+#8 46.10   Downloading dbt_protos-1.0.410-py3-none-any.whl.metadata (859 bytes)
+#8 46.11 Collecting deepdiff<9.0,>=7.0 (from dbt-common<2.0,>=1.0.4->dbt-core>=1.8.0)
+#8 46.13   Downloading deepdiff-8.6.1-py3-none-any.whl.metadata (8.6 kB)
+#8 46.16 Collecting dbt-common<2.0,>=1.0.4 (from dbt-core>=1.8.0)
+#8 46.17   Downloading dbt_common-1.37.1-py3-none-any.whl.metadata (4.9 kB)
+#8 46.22   Downloading dbt_common-1.37.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.24   Downloading dbt_common-1.36.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.28   Downloading dbt_common-1.35.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.31   Downloading dbt_common-1.34.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.33   Downloading dbt_common-1.33.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.36   Downloading dbt_common-1.32.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.39   Downloading dbt_common-1.31.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.41   Downloading dbt_common-1.30.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.44   Downloading dbt_common-1.29.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.47   Downloading dbt_common-1.28.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.50   Downloading dbt_common-1.27.1-py3-none-any.whl.metadata (5.0 kB)
+#8 46.52   Downloading dbt_common-1.27.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.55   Downloading dbt_common-1.26.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.57   Downloading dbt_common-1.25.1-py3-none-any.whl.metadata (5.0 kB)
+#8 46.60   Downloading dbt_common-1.25.0-py3-none-any.whl.metadata (5.0 kB)
+#8 46.63   Downloading dbt_common-1.24.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.67   Downloading dbt_common-1.23.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.69   Downloading dbt_common-1.22.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.72   Downloading dbt_common-1.21.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.75   Downloading dbt_common-1.20-py3-none-any.whl.metadata (4.9 kB)
+#8 46.78   Downloading dbt_common-1.19-py3-none-any.whl.metadata (4.9 kB)
+#8 46.81   Downloading dbt_common-1.18-py3-none-any.whl.metadata (4.9 kB)
+#8 46.83   Downloading dbt_common-1.17.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.86   Downloading dbt_common-1.16.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.89   Downloading dbt_common-1.15.0-py3-none-any.whl.metadata (4.9 kB)
+#8 46.98   Downloading dbt_common-1.14.0-py3-none-any.whl.metadata (5.2 kB)
+#8 47.17   Downloading dbt_common-1.13.0-py3-none-any.whl.metadata (5.2 kB)
+#8 47.20   Downloading dbt_common-1.12.0-py3-none-any.whl.metadata (5.2 kB)
+#8 47.23   Downloading dbt_common-1.11.0-py3-none-any.whl.metadata (5.3 kB)
+#8 47.51 Collecting dbt-core>=1.8.0
+#8 47.52   Downloading dbt_core-1.8.6-py3-none-any.whl.metadata (3.9 kB)
+#8 47.87   Downloading dbt_core-1.8.5-py3-none-any.whl.metadata (3.9 kB)
+#8 48.25   Downloading dbt_core-1.8.4-py3-none-any.whl.metadata (3.9 kB)
+#8 48.64   Downloading dbt_core-1.8.3-py3-none-any.whl.metadata (3.9 kB)
+#8 49.01   Downloading dbt_core-1.8.2-py3-none-any.whl.metadata (3.9 kB)
+#8 49.35   Downloading dbt_core-1.8.1-py3-none-any.whl.metadata (3.9 kB)
+#8 49.68   Downloading dbt_core-1.8.0-py3-none-any.whl.metadata (3.9 kB)
+#8 49.76 Collecting dbt-common<2.0,>=1.0.2 (from dbt-core>=1.8.0)
+#8 49.78   Downloading dbt_common-1.0.3-py3-none-any.whl.metadata (5.2 kB)
+#8 49.81   Downloading dbt_common-1.0.2-py3-none-any.whl.metadata (5.2 kB)
+#8 50.10 ERROR: Cannot install dbt-core==1.10.0, dbt-core==1.10.1, dbt-core==1.10.10, dbt-core==1.10.11, dbt-core==1.10.13, dbt-core==1.10.15, dbt-core==1.10.16, dbt-core==1.10.17, dbt-core==1.10.2, dbt-core==1.10.3, dbt-core==1.10.4, dbt-core==1.10.5, dbt-core==1.10.6, dbt-core==1.10.7, dbt-core==1.10.8, dbt-core==1.10.9, dbt-core==1.8.9, dbt-core==1.9.0, dbt-core==1.9.1, dbt-core==1.9.10, dbt-core==1.9.2, dbt-core==1.9.3, dbt-core==1.9.4, dbt-core==1.9.5, dbt-core==1.9.6, dbt-core==1.9.7, dbt-core==1.9.8 and dbt-core==1.9.9 because these package versions have conflicting dependencies.
+#8 50.10 
+#8 50.10 The conflict is caused by:
+#8 50.10     dbt-core 1.10.17 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.16 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.15 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.13 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.11 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.10 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.9 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.10.8 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.7 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.6 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.5 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.4 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.3 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.2 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.1 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.10.0 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.10 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.9.9 depends on protobuf<7.0 and >=6.0
+#8 50.10     dbt-core 1.9.8 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.7 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.6 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.5 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.4 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.3 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.2 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.1 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.9.0 depends on protobuf<6.0 and >=5.0
+#8 50.10     dbt-core 1.8.9 depends on protobuf<6.0 and >=5.0
+#8 50.10     The user requested (constraint) protobuf==4.25.5
+#8 50.10 
+#8 50.10 To fix this you could try to:
+#8 50.10 1. loosen the range of package versions you've specified
+#8 50.10 2. remove package versions to allow pip to attempt to solve the dependency conflict
+#8 50.10 
+#8 50.30 
+#8 50.30 [notice] A new release of pip is available: 24.2 -> 25.3
+#8 50.30 [notice] To update, run: pip install --upgrade pip
+#8 50.30 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+#8 ERROR: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir \"apache-airflow==2.10.3\"     --constraint \"https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.10.txt\"     pydantic==2.9.2 pyspark==3.5.3 requests==2.32.3     \"dbt-core>=1.8.0\" \"dbt-postgres>=1.8.0\"     apache-airflow-providers-apache-spark==4.11.2 apache-airflow-providers-amazon typer" did not complete successfully: exit code: 1
+------
+ > [4/5] RUN pip install --no-cache-dir "apache-airflow==2.10.3"     --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.10.txt"     pydantic==2.9.2 pyspark==3.5.3 requests==2.32.3     "dbt-core>=1.8.0" "dbt-postgres>=1.8.0"     apache-airflow-providers-apache-spark==4.11.2 apache-airflow-providers-amazon typer:
+50.10     The user requested (constraint) protobuf==4.25.5
+50.10 
+50.10 To fix this you could try to:
+50.10 1. loosen the range of package versions you've specified
+50.10 2. remove package versions to allow pip to attempt to solve the dependency conflict
+50.10 
+50.30 
+50.30 [notice] A new release of pip is available: 24.2 -> 25.3
+50.30 [notice] To update, run: pip install --upgrade pip
+50.30 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+------
+Dockerfile:21
+--------------------
+  20 |     USER airflow
+  21 | >>> RUN pip install --no-cache-dir "apache-airflow==2.10.3" \
+  22 | >>>     --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.10.txt" \
+  23 | >>>     pydantic==2.9.2 pyspark==3.5.3 requests==2.32.3 \
+  24 | >>>     "dbt-core>=1.8.0" "dbt-postgres>=1.8.0" \
+  25 | >>>     apache-airflow-providers-apache-spark==4.11.2 apache-airflow-providers-amazon typer
+  26 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir \"apache-airflow==2.10.3\"     --constraint \"https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.10.txt\"     pydantic==2.9.2 pyspark==3.5.3 requests==2.32.3     \"dbt-core>=1.8.0\" \"dbt-postgres>=1.8.0\"     apache-airflow-providers-apache-spark==4.11.2 apache-airflow-providers-amazon typer" did not complete successfully: exit code: 1

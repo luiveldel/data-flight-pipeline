@@ -13,14 +13,11 @@ class AviationStack(ABC):
     Class attributes shared by all AviationStack classes.
     """
 
-    _url: str = os.environ.get(
-        "AVIATIONSTACK_BASE_URL", "http://api.aviationstack.com/v1"
-    )
+    _url: str = os.environ.get("AVIATIONSTACK_BASE_URL", "http://api.aviationstack.com/v1")
     _api_key: str = os.environ.get("AVIATIONSTACK_API_KEY", "")
     _limit: int = int(os.environ.get("AVIATIONSTACK_LIMIT", 100))
 
     def __init__(self, *args, **kwargs):
-        # Para permitir subclasses con kwargs libres.
         self.args = args
         self.kwargs = kwargs
 

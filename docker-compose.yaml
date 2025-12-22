@@ -18,12 +18,14 @@ x-airflow-common:
     SPARK_HOME: /home/airflow/.local/lib/python3.10/site-packages/pyspark
     AIRFLOW_CONN_SPARK_DEFAULT: 'spark://spark-master:7077'
     AIRFLOW_CONN_AWS_DEFAULT: 'aws://minioadmin:minioadmin@?host=http%3A%2F%2Fminio%3A9000'
+    AVIATIONSTACK_API_KEY: "${AVIATIONSTACK_API_KEY}"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./spark_jobs:/spark_jobs
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ./config:/opt/airflow/config
+    - data_volume:/data
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -75,6 +77,7 @@ services:
       - "7077:7077"  # Master port
     volumes:
         - ./spark_jobs:/spark_jobs
+        - data_volume:/data
 
   spark-worker:
     image: apache/spark:3.5.0
@@ -90,6 +93,7 @@ services:
       - spark-master
     volumes:
         - ./spark_jobs:/spark_jobs
+        - data_volume:/data
 
   airflow-webserver:
     <<: *airflow-common
@@ -115,7 +119,9 @@ services:
 
   airflow-init:
     <<: *airflow-common
-    command: version
+    user: "0:0"
+    command: >
+      bash -c "mkdir -p /data/raw && chown -R ${AIRFLOW_UID:-50000}:0 /data && airflow version"
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
@@ -128,3 +134,9 @@ services:
 volumes:
   postgres-db-volume:
   minio-data:
+  data_volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${PWD}/data'

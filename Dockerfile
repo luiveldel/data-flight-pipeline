@@ -23,6 +23,8 @@ COPY pyproject.toml uv.lock ./
 RUN uv pip install --system --no-cache -r pyproject.toml && \
     rm -rf ~/.cache/pip /tmp/*
 
+RUN mkdir -p /data/raw && chown -R airflow:0 /data
+
 COPY spark_jobs ./spark_jobs
 
 USER airflow

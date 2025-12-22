@@ -2,3 +2,4 @@
 .pyproject.toml
 .venv
 logs
+__pycache__

@@ -1,5 +1,5 @@
 from typing import List
-from .utils.aviationstack import AviationStack
+from .aviationstack import AviationStack
 import os
 import math
 import json
@@ -12,15 +12,10 @@ class FlightsClient(AviationStack):
         return f"FlightsClient(limit={self._limit})"
 
 def extract_flights(
-    raw_dir: str,
+    raw_dir: str = "/data/raw",
     max_pages: int = 1,
 ) -> List[str]:
-    """
-    EXTRACT:
-    - Llama a /v1/flights (AviationStack) con paginación.
-    - Guarda cada respuesta en un JSON en raw_dir.
-    - Devuelve lista de paths JSON.
-    """
+
     client = FlightsClient()
 
     os.makedirs(raw_dir, exist_ok=True)

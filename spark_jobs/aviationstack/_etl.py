@@ -1,20 +1,21 @@
-from spark_jobs._transform import transform_flights
-from spark_jobs._extract import extract_flights
+from spark_jobs.aviationstack._load import load_flights
+from spark_jobs.aviationstack._transform import transform_flights
+from dags.utils.extract_api import extract_flights
 from typing import NamedTuple
 
 from pyspark.sql import DataFrame
-from .shared.base_etl import BaseETL
+from spark_jobs.shared.base_etl import BaseETL
 
 
-class JsonToTabularDataframes(NamedTuple):
+class AviationStackDataframes(NamedTuple):
     """NamedTuple to hold the extracted DataFrames."""
 
     aviationstack_json_df: DataFrame
 
-class AviationStackETL(BaseETL[JsonToTabularDataframes, DataFrame]):
+class AviationStackETL(BaseETL[AviationStackDataframes, DataFrame]):
     """ETL class for aviationstack."""
 
-    def _extract(self) -> JsonToTabularDataframes:
+    def _extract(self) -> AviationStackDataframes:
         """Extract the data from the source(s) and return a NamedTuple of DataFrame(s)."""
 
         json_paths = extract_flights(
@@ -24,9 +25,9 @@ class AviationStackETL(BaseETL[JsonToTabularDataframes, DataFrame]):
 
         aviationstack_json_df = self._spark.read.json(json_paths)
 
-        return JsonToTabularDataframes(aviationstack_json_df)
+        return AviationStackDataframes(aviationstack_json_df)
 
-    def _transform(self, extracted_dfs: JsonToTabularDataframes) -> DataFrame:
+    def _transform(self, extracted_dfs: AviationStackDataframes) -> DataFrame:
         """Transform the extracted DataFrames and return a DataFrame."""
 
         return transform_flights(extracted_dfs.aviationstack_json_df)
@@ -34,4 +35,4 @@ class AviationStackETL(BaseETL[JsonToTabularDataframes, DataFrame]):
     def _load(self, transformed_df: DataFrame) -> None:
         """Load the transformed DataFrame to the sink."""
 
-        transformed_df.write.mode("overwrite").parquet(self._config.aviationstack.bronze_dir)
+        return load_flights(transformed_df, self._config.aviationstack.bronze_dir)
