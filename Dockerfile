@@ -6,7 +6,7 @@ USER root
 # Install OpenJDK-17
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-         openjdk-17-jre-headless \
+  openjdk-17-jre-headless \
   && apt-get autoremove -yqq --purge \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
@@ -14,17 +14,16 @@ RUN apt-get update \
 # Set JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:0.5.6 /uv /usr/local/bin/uv
+USER root
+RUN mkdir -p /opt/data/raw && chown -R airflow:0 /opt/data
 
-# Install dependencies using uv (export to requirements.txt for pip compatibility)
-# Install as root to system paths, overriding PIP_USER=true
-COPY pyproject.toml uv.lock ./
-RUN uv pip install --system --no-cache -r pyproject.toml && \
-    rm -rf ~/.cache/pip /tmp/*
+USER airflow
+RUN pip install --no-cache-dir "apache-airflow==2.10.3" \
+  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.10.txt" \
+  pydantic==2.9.2 pyspark==3.5.3 requests==2.32.3 \
+  apache-airflow-providers-apache-spark==4.11.2 apache-airflow-providers-amazon typer
 
-RUN mkdir -p /data/raw && chown -R airflow:0 /data
-
+COPY include /opt/airflow/include
 COPY spark_jobs ./spark_jobs
 
 USER airflow

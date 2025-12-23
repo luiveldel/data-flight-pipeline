@@ -3,13 +3,16 @@ name = "data-flight-pipeline"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
-    "pydantic>=2.12.5",
-    "pyspark==3.5.0",
-    "requests>=2.32.5",
+    "pydantic==2.9.2",
+    "pyspark==3.5.3",
+    "requests==2.32.3",
     "dbt-core>=1.8.0",
     "dbt-postgres>=1.8.0",
+    "apache-airflow==2.10.3",
     "apache-airflow-providers-apache-spark==4.11.2",
-    "typer>=0.20.1",
+    "apache-airflow-providers-amazon>=9.0.0",
+    "typer>=0.12.0",
+    "python-dotenv>=1.0.1",
 ]
 
 [dependency-groups]

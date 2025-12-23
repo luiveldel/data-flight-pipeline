@@ -1,16 +1,44 @@
 from datetime import timedelta, datetime
+import json
+import os
 
 from airflow.decorators import dag
+from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
-
-# from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.operators.python import PythonOperator
+from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 
-from utils.extract_api import extract_flights
+from dags.utils.copy_s3_files import upload_to_s3
 
-DAG_NAME = "flights_extraction"
+# -----------------------------------------------------------------------------
+# - VARS
+# -----------------------------------------------------------------------------
+DAG_NAME = "flights_data_pipeline"
+OWNER = "luisandresvelazquez.d@gmail.com"
+EXECUTION_DATE = "{{ ds }}"
 
+# -----------------------------------------------------------------------------
+# - S3 (MINIO)
+# -----------------------------------------------------------------------------
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
+
+S3_BUCKET = "flights-data-lake"
+LOCAL_RAW_PATH = "/otp/data/raw"
+LOCAL_BRONZE_PATH = "/otp/data/bronze"
+MAX_PAGES = 1
+
+# -----------------------------------------------------------------------------
+# - Spark
+# -----------------------------------------------------------------------------
+SPARK_MASTER_URL = os.environ.get("SPARK_MASTER_URL")
+
+# -----------------------------------------------------------------------------
+# - DAG
+# -----------------------------------------------------------------------------
 DEFAULT_ARGS = {
+    "owner": OWNER,
     "retries": 3,
     "retry_delay": timedelta(minutes=5),
     "email_on_failure": False,
@@ -22,37 +50,72 @@ DEFAULT_ARGS = {
     DAG_NAME,
     start_date=datetime(2025, 12, 21),
     catchup=False,
-    description="AviationStack → PySpark → dbt ETL Pipeline",
-    schedule_interval="@daily",
+    schedule_interval="0 0 * * *",
     default_args=DEFAULT_ARGS,
-    tags=["spark", "aviationstack", "etl", "portfolio"],
+    tags=["spark", "minio", "aviationstack", "etl"],
 )
 def dag_() -> None:
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    extract_api = PythonOperator(
+    create_bucket = S3CreateBucketOperator(
+        task_id="create_minio_bucket",
+        bucket_name=S3_BUCKET,
+        aws_conn_id="aws_default",
+    )
+
+    extract_api = BashOperator(
         task_id="extract_api_to_json",
-        python_callable=extract_flights,
-        op_kwargs={
-            "raw_dir": "/data/raw",
-            "max_pages": 2,
+        bash_command=f"python3 -m include.api \
+            {LOCAL_RAW_PATH} \
+            {MAX_PAGES} \
+            {EXECUTION_DATE}",
+        env={
+            "PYTHONPATH": "/opt/airflow",
         },
     )
 
-    # spark_etl = SparkSubmitOperator(
-    #     task_id="etl_aviationstack",
-    #     application="spark_jobs/aviationstack/main_etl.py",
-    #     conf={
-    #         "spark.master": "spark://spark-master:7077",
-    #         "spark.executor.memory": "2g",
-    #         "spark.executor.cores": "2",
-    #         "spark.driver.memory": "2g",
-    #         "spark.sql.adaptive.enabled": "true",
-    #     },
-    # )
+    upload_raw = PythonOperator(
+        task_id="upload_raw_to_minio",
+        python_callable=upload_to_s3,
+        op_kwargs={
+            "bucket": S3_BUCKET,
+            "local_path": LOCAL_RAW_PATH,
+            "remote_prefix": f"raw/{EXECUTION_DATE}",
+        },
+    )
 
-    start >> extract_api >> end
+    # Note: We pass the config as a JSON string to main_cli.py
+    spark_vars = json.dumps(
+        {
+            "raw_dir": f"s3a://{S3_BUCKET}/raw/{EXECUTION_DATE}",
+            "bronze_dir": f"s3a://{S3_BUCKET}/bronze/{EXECUTION_DATE}",
+            "max_pages": MAX_PAGES,
+        }
+    )
+
+    spark_etl = BashOperator(
+        task_id="etl_aviationstack",
+        bash_command=f"""
+            /home/airflow/.local/bin/spark-submit \
+                --master {SPARK_MASTER_URL} \
+                --conf spark.hadoop.fs.s3a.endpoint={MINIO_ENDPOINT} \
+                --conf spark.hadoop.fs.s3a.access.key={MINIO_ACCESS_KEY} \
+                --conf spark.hadoop.fs.s3a.secret.key={MINIO_SECRET_KEY} \
+                --conf spark.hadoop.fs.s3a.path.style.access=true \
+                --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem \
+                --conf spark.jars.packages=org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262 \
+                --name arrow-spark \
+                /spark_jobs/main_cli.py aviationstack '{spark_vars}'
+        """,
+        env={
+            "PYTHONPATH": "/opt/airflow/dags:/opt/airflow/include:/spark_jobs",
+            "PYSPARK_PYTHON": "/home/airflow/.local/bin/python3",
+            "PYSPARK_DRIVER_PYTHON": "/home/airflow/.local/bin/python3",
+        },
+    )
+
+    start >> create_bucket >> extract_api >> upload_raw >> spark_etl >> end
 
 
 dag_()

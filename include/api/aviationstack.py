@@ -4,6 +4,9 @@ import requests
 from typing import Dict, Any, Optional
 import logging
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -13,9 +16,9 @@ class AviationStack(ABC):
     Class attributes shared by all AviationStack classes.
     """
 
-    _url: str = os.environ.get("AVIATIONSTACK_BASE_URL", "http://api.aviationstack.com/v1")
-    _api_key: str = os.environ.get("AVIATIONSTACK_API_KEY", "")
-    _limit: int = int(os.environ.get("AVIATIONSTACK_LIMIT", 100))
+    _url = os.environ.get("AVIATIONSTACK_BASE_URL")
+    _api_key = os.environ.get("AVIATIONSTACK_API_KEY")
+    _limit = int(os.environ.get("AVIATIONSTACK_LIMIT", 100))
 
     def __init__(self, *args, **kwargs):
         self.args = args
@@ -24,9 +27,9 @@ class AviationStack(ABC):
     @abstractmethod
     def __repr__(self) -> str:
         "Subclasses must implement __repr__ for logging."
-        ...
+        raise NotImplementedError
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.__repr__()
 
     def _check_config(self) -> None:
@@ -34,6 +37,8 @@ class AviationStack(ABC):
             raise ValueError("AVIATIONSTACK_API_KEY is not defined.")
         if not self._url:
             raise ValueError("AVIATIONSTACK_BASE_URL is not defined.")
+        if not self._limit:
+            raise ValueError("AVIATIONSTACK_LIMIT is not defined.")
 
     def _build_base_params(self) -> Dict[str, Any]:
         return {
