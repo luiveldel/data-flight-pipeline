@@ -4,9 +4,6 @@ import requests
 from typing import Dict, Any, Optional
 import logging
 import time
-from dotenv import load_dotenv
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -16,13 +13,13 @@ class AviationStack(ABC):
     Class attributes shared by all AviationStack classes.
     """
 
-    _url = os.environ.get("AVIATIONSTACK_BASE_URL")
-    _api_key = os.environ.get("AVIATIONSTACK_API_KEY")
-    _limit = int(os.environ.get("AVIATIONSTACK_LIMIT", 100))
-
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
+        # Read environment variables at instantiation time, not import time
+        self._url = os.environ.get("AVIATIONSTACK_BASE_URL")
+        self._api_key = os.environ.get("AVIATIONSTACK_API_KEY")
+        self._limit = int(os.environ.get("AVIATIONSTACK_LIMIT", 100))
 
     @abstractmethod
     def __repr__(self) -> str:

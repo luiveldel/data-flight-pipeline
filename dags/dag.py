@@ -5,10 +5,9 @@ import os
 from airflow.decorators import dag
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 
-from dags.utils.copy_s3_files import upload_to_s3
+from utils.upload_to_s3 import upload_to_s3
 
 # -----------------------------------------------------------------------------
 # - VARS
@@ -25,8 +24,8 @@ MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
 MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
 
 S3_BUCKET = "flights-data-lake"
-LOCAL_RAW_PATH = "/otp/data/raw"
-LOCAL_BRONZE_PATH = "/otp/data/bronze"
+LOCAL_RAW_PATH = "/opt/data/raw"
+LOCAL_BRONZE_PATH = "/opt/data/bronze"
 MAX_PAGES = 1
 
 # -----------------------------------------------------------------------------
@@ -64,6 +63,7 @@ def dag_() -> None:
         aws_conn_id="aws_default",
     )
 
+    # TODO: refactor this task, it's not airflow-y, it's just a bash command
     extract_api = BashOperator(
         task_id="extract_api_to_json",
         bash_command=f"python3 -m include.api \
@@ -71,21 +71,18 @@ def dag_() -> None:
             {MAX_PAGES} \
             {EXECUTION_DATE}",
         env={
+            **os.environ.copy(),
             "PYTHONPATH": "/opt/airflow",
         },
     )
 
-    upload_raw = PythonOperator(
+    upload_raw_to_minio = upload_to_s3(
         task_id="upload_raw_to_minio",
-        python_callable=upload_to_s3,
-        op_kwargs={
-            "bucket": S3_BUCKET,
-            "local_path": LOCAL_RAW_PATH,
-            "remote_prefix": f"raw/{EXECUTION_DATE}",
-        },
+        bucket=S3_BUCKET,
+        local_path=LOCAL_RAW_PATH,
+        remote_prefix=f"raw/{EXECUTION_DATE}",
     )
 
-    # Note: We pass the config as a JSON string to main_cli.py
     spark_vars = json.dumps(
         {
             "raw_dir": f"s3a://{S3_BUCKET}/raw/{EXECUTION_DATE}",
@@ -115,7 +112,14 @@ def dag_() -> None:
         },
     )
 
-    start >> create_bucket >> extract_api >> upload_raw >> spark_etl >> end
+    (
+        start
+        >> create_bucket
+        >> extract_api
+        >> upload_raw_to_minio
+        >> spark_etl
+        >> end
+    )
 
 
 dag_()
