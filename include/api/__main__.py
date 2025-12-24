@@ -1,5 +1,5 @@
 import typer
-from .extract_api import extract_flights
+from include.api.extract_api import extract_flights
 
 
 def main(
