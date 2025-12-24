@@ -45,7 +45,7 @@ Free aviation data from [https://aviationstack.com/](https://aviationstack.com/)
 
 ```mermaid
 graph TB
-    A[OpenFlights CSV<br/>OpenSky API] --> B[Airflow DAG]
+    A[AviationStack API] --> B[Airflow DAG]
     B --> C[PySpark ETL<br/>Clean + Aggregate]
     C --> D[MinIO S3 Lake<br/>bronze/silver/raw]
     D --> E[dbt Models<br/>dim_airports<br/>fact_flights]
@@ -65,9 +65,9 @@ graph TB
 
 ## 🎯 Highlights
 
-- ✅ **End-to-End Data Engineering**: Ingesta → Lake → DWH → BI
+- ✅ **End-to-End Data Engineering**: Ingest → Lake → DWH → BI
 - ✅ **Production Stack**: Spark, Airflow, dbt, S3 (MinIO)
-- ✅ **Aviation Domain**: Flights data (tu expertise)
+- ✅ **Aviation Domain**: Flights data
 - ✅ **TDD**: dbt tests (duplicates, not_null, unique combos)
 - ✅ **IaC**: Docker + GitHub Actions CI/CD
 - ✅ **Scalable**: VPS-ready, AWS-like infra
