@@ -1,27 +1,34 @@
 # Data Flight Pipeline
 
-End-to-end aviation ETL: OpenSky flights → PySpark → Airflow → dbt → MinIO → Metabase
+End-to-end aviation ETL: AviationStack API → MinIO → PySpark → Airflow → dbt → MinIO → Metabase
 
 [![Docker Compose](https://img.shields.io/badge/docker-compose%20up-green)](docker-compose.yml)
 [![PySpark](https://img.shields.io/badge/PySpark-3.5-blue)](pyspark/)
 [![dbt](https://img.shields.io/badge/dbt-1.8-orange)](dbt/)
 
-## Stack
+## 💻 Stack
 
-- 🛫 OpenSky/OpenFlights (free aviation data)
+- 🛫 AviationStack API (free aviation data)
+    - Future releases: Add OpenFlights CSVs and OpenSky API
 - ⚡ PySpark ETL jobs
 - 🌊 Airflow DAGs orchestration
 - 🔄 dbt transformations + tests
 - 🗄️ MinIO S3 lake + Postgres
 - 📊 Metabase dashboards
 
-## Quickstart
+## 💾 Storage
+
+Free Oracle VPS (4 vCPUs, 32GB RAM, 200GB SSD)
+
+[Oracle Cloud](https://www.oracle.com/es/cloud/)
+
+## 🚀 Quickstart
 
 ```bash
 docker compose up -d
 ```
 
-**Accede a:**
+**Access to:**
 
 - **Airflow**: http://localhost:8080 (admin/admin)
 - **MinIO**: http://localhost:9001 (minioadmin/minioadmin)
@@ -30,13 +37,9 @@ docker compose up -d
 
 ## 🛫 Dataset: Open Flights
 
-Free aviation data desde [OpenFlights.org](https://openflights.org):
+Free aviation data from [https://aviationstack.com/](https://aviationstack.com/):
 
-- `airports.dat` (7K aeropuertos)
-- `routes.dat` (67K rutas)
-- `airlines.dat` (5K aerolíneas)
-
-Pipeline simula ingesta diaria de vuelos reales via OpenSky API.
+- 100 requests/month limit
 
 ## 🏗️ Architecture
 
@@ -111,5 +114,5 @@ MIT
 
 ---
 
-**Built by Luis Andres Velazquez | Data Engineer**
+**Built by Luis Andres Velazquez | Data Engineer @ [Next Digital Hub](https://www.nextdigital.es/)**
 Seville, Spain 🇪🇸
