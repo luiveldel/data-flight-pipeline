@@ -14,16 +14,16 @@ x-airflow-common:
     # Java/Spark config for Airflow
     JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     SPARK_HOME: /home/airflow/.local/lib/python3.10/site-packages/pyspark
-    AIRFLOW_CONN_SPARK_DEFAULT: 'spark://spark-master:7077'
+    AIRFLOW_CONN_SPARK_DEFAULT: "${SPARK_MASTER_URL}"
     # AviationStack API
     AVIATIONSTACK_API_KEY: "${AVIATIONSTACK_API_KEY}"
-    AVIATIONSTACK_BASE_URL: "${AVIATIONSTACK_BASE_URL:-http://api.aviationstack.com/v1}"
-    AVIATIONSTACK_LIMIT: "${AVIATIONSTACK_LIMIT:-100}"
+    AVIATIONSTACK_BASE_URL: "${AVIATIONSTACK_BASE_URL}"
+    AVIATIONSTACK_LIMIT: "${AVIATIONSTACK_LIMIT}"
     # MinIO/S3 Configuration
     MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
     MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
-    MINIO_ENDPOINT: "${MINIO_ENDPOINT:-http://minio:9000}"
-    SPARK_MASTER_URL: "${SPARK_MASTER_URL:-spark://spark-master:7077}"
+    MINIO_ENDPOINT: "${MINIO_ENDPOINT}"
+    SPARK_MASTER_URL: "${SPARK_MASTER_URL}"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./include:/opt/airflow/include
@@ -31,8 +31,9 @@ x-airflow-common:
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ./config:/opt/airflow/config
+    - ./dbt_transform:/opt/airflow/dbt_transform
     - data_volume:/opt/data
-  user: "${AIRFLOW_UID:-50000}:0"
+  user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
     postgres:
@@ -42,13 +43,13 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 5s
       retries: 5
     ports:
@@ -61,13 +62,13 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
     command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "${MINIO_ENDPOINT}/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -82,12 +83,12 @@ services:
       - "8081:8080"  # Spark UI
       - "7077:7077"  # Master port
     volumes:
-        - ./spark_jobs:/spark_jobs
+        - ./spark_jobs:/opt/spark_jobs
         - data_volume:/opt/data
 
   spark-worker:
     image: apache/spark:3.5.3
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
     environment:
       - SPARK_WORKER_MEMORY=1G
       - SPARK_WORKER_CORES=1
@@ -98,7 +99,7 @@ services:
     depends_on:
       - spark-master
     volumes:
-        - ./spark_jobs:/spark_jobs
+        - ./spark_jobs:/opt/spark_jobs
         - data_volume:/opt/data
 
   airflow-webserver:
@@ -132,8 +133,8 @@ services:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
     depends_on:
       - postgres
 

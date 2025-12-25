@@ -7,7 +7,9 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 
-from utils.upload_to_s3 import upload_to_s3
+from dags.utils.parquet_to_pg import load_parquet_dir_to_postgres
+from airflow.operators.python import PythonOperator
+from dags.utils.upload_to_s3 import upload_to_s3
 
 # -----------------------------------------------------------------------------
 # - VARS
@@ -27,6 +29,15 @@ S3_BUCKET = "flights-data-lake"
 LOCAL_RAW_PATH = "/opt/data/raw"
 LOCAL_BRONZE_PATH = "/opt/data/bronze"
 MAX_PAGES = 1
+
+# -----------------------------------------------------------------------------
+# - Postgres
+# -----------------------------------------------------------------------------
+POSTGRES_USER = os.environ.get("POSTGRES_USER")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+POSTGRES_DB = os.environ.get("POSTGRES_DB")
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
+POSTGRES_URL = f"jdbc:postgresql://{POSTGRES_HOST}:5432/{POSTGRES_DB}"
 
 # -----------------------------------------------------------------------------
 # - Spark
@@ -79,14 +90,15 @@ def dag_() -> None:
     upload_raw_to_minio = upload_to_s3(
         task_id="upload_raw_to_minio",
         bucket=S3_BUCKET,
-        local_path=LOCAL_RAW_PATH,
-        remote_prefix=f"raw/{EXECUTION_DATE}",
+        local_path=f"{LOCAL_RAW_PATH}/insert_date={EXECUTION_DATE}",
+        remote_prefix=f"raw/insert_date={EXECUTION_DATE}",
     )
+
 
     spark_vars = json.dumps(
         {
-            "raw_dir": f"s3a://{S3_BUCKET}/raw/{EXECUTION_DATE}",
-            "bronze_dir": f"s3a://{S3_BUCKET}/bronze/{EXECUTION_DATE}",
+            "raw_dir": f"s3a://{S3_BUCKET}/raw/insert_date={EXECUTION_DATE}",
+            "bronze_dir": f"s3a://{S3_BUCKET}/bronze/insert_date={EXECUTION_DATE}",
             "max_pages": MAX_PAGES,
         }
     )
@@ -106,9 +118,36 @@ def dag_() -> None:
                 /spark_jobs/main_cli.py aviationstack '{spark_vars}'
         """,
         env={
-            "PYTHONPATH": "/opt/airflow/dags:/opt/airflow/include:/spark_jobs",
+            "PYTHONPATH": "/opt/airflow/dags:/opt/airflow/include:/spark_jobs:/",
             "PYSPARK_PYTHON": "/home/airflow/.local/bin/python3",
             "PYSPARK_DRIVER_PYTHON": "/home/airflow/.local/bin/python3",
+        },
+    )
+
+    ingest_to_postgres = PythonOperator(
+        task_id="ingest_parquet_to_postgres",
+        python_callable=load_parquet_dir_to_postgres,
+        op_kwargs={
+            "parquet_dir": f"/opt/data/bronze/insert_date={EXECUTION_DATE}",
+            "table_name": "avionstack_flights",
+            "conn_params": {
+                "host": POSTGRES_HOST,
+                "user": POSTGRES_USER,
+                "password": POSTGRES_PASSWORD,
+                "database": POSTGRES_DB,
+            },
+        },
+    )
+
+    dbt_transform = BashOperator(
+        task_id="dbt_transform",
+        bash_command="cd /opt/airflow/dbt_transform && dbt run --profiles-dir .",
+        env={
+            **os.environ.copy(),
+            "POSTGRES_HOST": POSTGRES_HOST,
+            "POSTGRES_USER": POSTGRES_USER,
+            "POSTGRES_PASSWORD": POSTGRES_PASSWORD,
+            "POSTGRES_DB": POSTGRES_DB,
         },
     )
 
@@ -118,6 +157,8 @@ def dag_() -> None:
         >> extract_api
         >> upload_raw_to_minio
         >> spark_etl
+        >> ingest_to_postgres
+        >> dbt_transform
         >> end
     )
 

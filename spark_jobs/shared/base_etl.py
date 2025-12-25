@@ -29,7 +29,7 @@ class BaseETL(
         self._load(transformed_dfs)
 
     @abstractmethod
-    def _extract(self, config: AviationStackParams) -> ExtractedDataFrames:
+    def _extract(self) -> ExtractedDataFrames:
         """Extract the data from the source(s) and return a NamedTuple of DataFrame(s)."""
 
     @abstractmethod
@@ -37,5 +37,5 @@ class BaseETL(
         """Transform the extracted DataFrames and return a NamedTuple of DataFrame(s)."""
 
     @abstractmethod
-    def _load(self, transformed_dfs: TransformedDataFrames, config: AviationStackParams) -> None:
+    def _load(self, transformed_dfs: TransformedDataFrames) -> None:
         """Load the transformed DataFrames to the sink(s)."""

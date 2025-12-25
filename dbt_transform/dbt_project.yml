@@ -1,0 +1,40 @@
+name: "dbt_flight_transform"
+version: "1.0.0"
+config-version: 2
+
+profile: "default"
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  +materialized: ephemeral
+  dbt_flight_transform:
+    staging:
+      +materialized: "flights_staging"
+    marts:
+      +materialized: "flights_business"
+
+tests:
+  +schema: metadata
+  +store_failures: true
+
+vars:
+  execution_date:  "{{ (modules.datetime.datetime.now()).strftime('%Y-%m-%d') }}"
+
+unit_tests_config:
+  input_format: "csv"
+  column_separator: "|"
+  line_separator: "\n"
+  type_separator: "::"
+  include_missing_columns: true
+  

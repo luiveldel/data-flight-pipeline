@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: flights_staging
+    schema: flights_staging
+    tables:
+      - name: avionstack_flights

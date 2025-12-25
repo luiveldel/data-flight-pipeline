@@ -41,8 +41,6 @@ def upload_to_s3(
                     bucket_name=bucket,
                     replace=True,
                 )
-                logger.info(f"Deleting local file {local_file}")
-                os.remove(local_file)
 
     return upload_to_s3(
         bucket=bucket,
