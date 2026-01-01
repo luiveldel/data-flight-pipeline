@@ -5,6 +5,7 @@ x-airflow-common:
     dockerfile: Dockerfile
   environment:
     &airflow-common-env
+    PATH: "/opt/airflow/.venv/bin:/home/airflow/.local/bin:/usr/local/bin:/usr/bin:/bin"
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__FERNET_KEY: ''
@@ -13,7 +14,7 @@ x-airflow-common:
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
     # Java/Spark config for Airflow
     JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-    SPARK_HOME: /home/airflow/.local/lib/python3.10/site-packages/pyspark
+    SPARK_HOME: /opt/airflow/.venv/lib/python3.10/site-packages/pyspark
     AIRFLOW_CONN_SPARK_DEFAULT: "${SPARK_MASTER_URL}"
     # AviationStack API
     AVIATIONSTACK_API_KEY: "${AVIATIONSTACK_API_KEY}"
@@ -24,15 +25,24 @@ x-airflow-common:
     MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
     MINIO_ENDPOINT: "${MINIO_ENDPOINT}"
     SPARK_MASTER_URL: "${SPARK_MASTER_URL}"
+    # dbt Configuration
+    DBT_PROFILES_DIR: /opt/airflow/dbt_transform
+    # Postgres for dbt (Gold Marts)
+    POSTGRES_HOST: postgres
+    POSTGRES_USER: "${POSTGRES_USER}"
+    POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    POSTGRES_DB: "${POSTGRES_DB}"
+    POSTGRES_PORT: 5432
+    POSTGRES_SCHEMA: "${POSTGRES_SCHEMA:-public}"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./include:/opt/airflow/include
-    - ./spark_jobs:/spark_jobs
+    - ./spark_jobs:/opt/airflow/spark_jobs
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ./config:/opt/airflow/config
     - ./dbt_transform:/opt/airflow/dbt_transform
-    - data_volume:/opt/data
+    - data_volume:/opt/airflow/data
   user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
@@ -48,8 +58,9 @@ services:
       POSTGRES_DB: "${POSTGRES_DB}"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       retries: 5
     ports:
@@ -68,7 +79,7 @@ services:
     volumes:
       - minio-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "${MINIO_ENDPOINT}/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -83,24 +94,53 @@ services:
       - "8081:8080"  # Spark UI
       - "7077:7077"  # Master port
     volumes:
-        - ./spark_jobs:/opt/spark_jobs
-        - data_volume:/opt/data
+        - ./spark_jobs:/opt/airflow/spark_jobs
+        - data_volume:/opt/airflow/data
 
   spark-worker:
     image: apache/spark:3.5.3
     command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
     environment:
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
+    ports:
+      - "8089:8081"
     depends_on:
       - spark-master
     volumes:
-        - ./spark_jobs:/opt/spark_jobs
-        - data_volume:/opt/data
+        - ./spark_jobs:/opt/airflow/spark_jobs
+        - data_volume:/opt/airflow/data
+
+  spark-thriftserver:
+    image: apache/spark:3.5.3
+    container_name: spark-thriftserver
+    depends_on:
+      - spark-master
+      - minio
+    ports:
+      - "10000:10000"
+    environment:
+      SPARK_MASTER_URL: "${SPARK_MASTER_URL}"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+      MINIO_ENDPOINT: "${MINIO_ENDPOINT}"
+    command: >
+      /opt/spark/bin/spark-submit
+      --class org.apache.spark.sql.hive.thriftserver.HiveThriftServer2
+      --master ${SPARK_MASTER_URL}
+      --name Thrift-JDBC-ODBC-Server
+      --conf spark.hadoop.fs.s3a.endpoint=${MINIO_ENDPOINT}
+      --conf spark.hadoop.fs.s3a.access.key=${MINIO_ACCESS_KEY}
+      --conf spark.hadoop.fs.s3a.secret.key=${MINIO_SECRET_KEY}
+      --conf spark.hadoop.fs.s3a.path.style.access=true
+      --conf spark.hadoop.fs.s3a.connection.ssl.enabled=false
+      --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem
+      --hiveconf hive.server2.thrift.bind.host=0.0.0.0
+      --hiveconf hive.server2.thrift.port=10000
 
   airflow-webserver:
     <<: *airflow-common
@@ -128,7 +168,9 @@ services:
     <<: *airflow-common
     user: "0:0"
     command: >
-      bash -c "mkdir -p /opt/data/raw && chown -R ${AIRFLOW_UID:-50000}:0 /opt/data && airflow version"
+      bash -c "mkdir -p /opt/airflow/data/raw &&
+              chown -R ${AIRFLOW_UID:-50000}:0 /opt/airflow/data &&
+              airflow version"
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
@@ -139,6 +181,7 @@ services:
       - postgres
 
 volumes:
+  airflow-uv-venv:
   postgres-db-volume:
   minio-data:
   data_volume:

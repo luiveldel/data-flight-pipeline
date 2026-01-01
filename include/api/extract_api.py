@@ -14,7 +14,7 @@ class FlightsClient(AviationStack):
 
 
 def extract_flights(
-    raw_dir: str = "/data/raw",
+    raw_dir: str = "/opt/airflow/data/raw",
     max_pages: int = 1,
     execution_date: str = "1970-01-01",
 ) -> List[str]:

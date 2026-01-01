@@ -18,23 +18,27 @@ clean-targets:
 
 models:
   +materialized: ephemeral
+
   dbt_flight_transform:
     staging:
-      +materialized: "flights_staging"
+      +materialized: view
+    intermediate:
+      +materialized: view
     marts:
-      +materialized: "flights_business"
+      +materialized: incremental
+      +incremental_strategy: merge
 
 tests:
   +schema: metadata
   +store_failures: true
 
 vars:
-  execution_date:  "{{ (modules.datetime.datetime.now()).strftime('%Y-%m-%d') }}"
+  execution_date: "{{ (modules.datetime.datetime.now()).strftime('%Y-%m-%d') }}"
+  s3_bronze_path: "s3://flights-data-lake/bronze/insert_date="
 
-unit_tests_config:
-  input_format: "csv"
-  column_separator: "|"
-  line_separator: "\n"
-  type_separator: "::"
-  include_missing_columns: true
-  
+  unit_tests_config:
+    input_format: "csv"
+    column_separator: "|"
+    line_separator: "\n"
+    type_separator: "::"
+    include_missing_columns: true

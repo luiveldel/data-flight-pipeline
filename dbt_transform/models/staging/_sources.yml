@@ -1,7 +1,8 @@
 version: 2
 
 sources:
-  - name: flights_staging
-    schema: flights_staging
+  - name: flights_raw
     tables:
-      - name: avionstack_flights
+      - name: lnd_flights
+        meta:
+          external_location: "s3://flights-data-lake/bronze/insert_date={{ var('execution_date') }}/*.parquet"

@@ -7,9 +7,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 
-from dags.utils.parquet_to_pg import load_parquet_dir_to_postgres
-from airflow.operators.python import PythonOperator
-from dags.utils.upload_to_s3 import upload_to_s3
+from utils.upload_to_s3 import upload_to_s3
 
 # -----------------------------------------------------------------------------
 # - VARS
@@ -26,8 +24,8 @@ MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
 MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
 
 S3_BUCKET = "flights-data-lake"
-LOCAL_RAW_PATH = "/opt/data/raw"
-LOCAL_BRONZE_PATH = "/opt/data/bronze"
+LOCAL_RAW_PATH = "/opt/airflow/data/raw"
+LOCAL_BRONZE_PATH = "/opt/airflow/data/bronze"
 MAX_PAGES = 1
 
 # -----------------------------------------------------------------------------
@@ -94,7 +92,6 @@ def dag_() -> None:
         remote_prefix=f"raw/insert_date={EXECUTION_DATE}",
     )
 
-
     spark_vars = json.dumps(
         {
             "raw_dir": f"s3a://{S3_BUCKET}/raw/insert_date={EXECUTION_DATE}",
@@ -106,8 +103,10 @@ def dag_() -> None:
     spark_etl = BashOperator(
         task_id="etl_aviationstack",
         bash_command=f"""
-            /home/airflow/.local/bin/spark-submit \
+            /opt/airflow/.venv/bin/spark-submit \
                 --master {SPARK_MASTER_URL} \
+                --total-executor-cores 1 \
+                --executor-memory 512M \
                 --conf spark.hadoop.fs.s3a.endpoint={MINIO_ENDPOINT} \
                 --conf spark.hadoop.fs.s3a.access.key={MINIO_ACCESS_KEY} \
                 --conf spark.hadoop.fs.s3a.secret.key={MINIO_SECRET_KEY} \
@@ -115,27 +114,12 @@ def dag_() -> None:
                 --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem \
                 --conf spark.jars.packages=org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262 \
                 --name arrow-spark \
-                /spark_jobs/main_cli.py aviationstack '{spark_vars}'
+                /opt/airflow/spark_jobs/main_cli.py aviationstack '{spark_vars}'
         """,
         env={
-            "PYTHONPATH": "/opt/airflow/dags:/opt/airflow/include:/spark_jobs:/",
-            "PYSPARK_PYTHON": "/home/airflow/.local/bin/python3",
-            "PYSPARK_DRIVER_PYTHON": "/home/airflow/.local/bin/python3",
-        },
-    )
-
-    ingest_to_postgres = PythonOperator(
-        task_id="ingest_parquet_to_postgres",
-        python_callable=load_parquet_dir_to_postgres,
-        op_kwargs={
-            "parquet_dir": f"/opt/data/bronze/insert_date={EXECUTION_DATE}",
-            "table_name": "avionstack_flights",
-            "conn_params": {
-                "host": POSTGRES_HOST,
-                "user": POSTGRES_USER,
-                "password": POSTGRES_PASSWORD,
-                "database": POSTGRES_DB,
-            },
+            "PYTHONPATH": "/opt/airflow:/opt/airflow/dags:/opt/airflow/include",
+            "PYSPARK_PYTHON": "/opt/airflow/.venv/bin/python3",
+            "PYSPARK_DRIVER_PYTHON": "/opt/airflow/.venv/bin/python3",
         },
     )
 
@@ -157,7 +141,6 @@ def dag_() -> None:
         >> extract_api
         >> upload_raw_to_minio
         >> spark_etl
-        >> ingest_to_postgres
         >> dbt_transform
         >> end
     )

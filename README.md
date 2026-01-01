@@ -68,11 +68,11 @@ graph TB
 - ✅ **End-to-End Data Engineering**: Ingest → Lake → DWH → BI
 - ✅ **Production Stack**: Spark, Airflow, dbt, S3 (MinIO)
 - ✅ **Aviation Domain**: Flights data
-- ✅ **TDD**: dbt tests (duplicates, not_null, unique combos)
-- ✅ **IaC**: Docker + GitHub Actions CI/CD
+- ✅ **TDD**: dbt tests (duplicates, not_null, unique combos) (🚧 WIP)
+- ✅ **IaC**: Docker + GitHub Actions CI/CD (🚧 WIP)
 - ✅ **Scalable**: VPS-ready, AWS-like infra
 
-## 📊 Sample Dashboards
+## 📊 Sample Dashboards (🚧 WIP)
 
 _(Screenshots post-setup)_
 
@@ -93,7 +93,7 @@ docker compose exec dbt dbt run --models fact_flights
 docker compose exec airflow airflow dags test flights_etl_dag 2025-12-20
 ```
 
-## 📈 Pipeline Metrics
+## 📈 Pipeline Metrics (🚧 WIP)
 
 | Metric        | Value      | dbt Test              |
 | ------------- | ---------- | --------------------- |

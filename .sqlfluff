@@ -1,0 +1,17 @@
+[sqlfluff]
+dialect = sparksql
+templater = dbt
+exclude_rules = "L031, L044, L051, L059, L034, L001, L016, L057, L029, L011"
+
+[sqlfluff:templater:dbt]
+project_dir = ./dbt_transform
+profiles_dir = ./dbt_transform
+
+[sqlfluff:indentation]
+indented_joins = "True"
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
