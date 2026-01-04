@@ -1,11 +1,7 @@
-{{
-    config(
-        warn_if='> 5',
-    )
-}}
+
 
 select *
-from {{ ref('int_flights_kpis') }}
+from "analytics"."main"."int_flights_kpis"
 where not (
     (dep_delay_min is null and delay_category = 'unknown') or
     (dep_delay_min > 30 and delay_category = 'high_delay') or

@@ -6,10 +6,6 @@
     )
 }}
 
-with stg_flights_bronze as (
-    select * from {{ ref('stg_flights_bronze') }}
-)
-
-select count(*) as null_count
-from stg_flights_bronze
+select *
+from {{ ref('stg_lnd_flights') }}
 where flight_date is null

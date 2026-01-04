@@ -3,13 +3,13 @@ default:
   outputs:
     duckdb_analytics:
       type: duckdb
-      path: /opt/airflow/data/analytics.duckdb
+      path: "{{ env_var('DUCKDB_PATH', '../data/analytics.duckdb') }}"
       extensions:
         - httpfs
         - parquet
       settings:
-        s3_endpoint: "{{ env_var('MINIO_ENDPOINT') | replace('http://', '') | replace('https://', '') }}"
-        s3_access_key_id: "{{ env_var('MINIO_ACCESS_KEY') }}"
-        s3_secret_access_key: "{{ env_var('MINIO_SECRET_KEY') }}"
+        s3_endpoint: "{{ env_var('MINIO_EXTERNAL_ENDPOINT', env_var('MINIO_ENDPOINT', 'localhost:9000')) | replace('http://', '') | replace('https://', '') }}"
+        s3_access_key_id: "{{ env_var('MINIO_ACCESS_KEY', 'minio') }}"
+        s3_secret_access_key: "{{ env_var('MINIO_SECRET_KEY', 'minio123') }}"
         s3_use_ssl: false
         s3_url_style: path

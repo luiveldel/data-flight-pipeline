@@ -7,7 +7,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 
-from utils.upload_to_s3 import upload_to_s3
+from utils import upload_to_s3, format_dbt_vars
 
 # -----------------------------------------------------------------------------
 # - VARS
@@ -36,6 +36,8 @@ POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_DB = os.environ.get("POSTGRES_DB")
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
 POSTGRES_URL = f"jdbc:postgresql://{POSTGRES_HOST}:5432/{POSTGRES_DB}"
+
+DBT_PROFILES_DIR = os.environ.get("DBT_PROFILES_DIR")
 
 # -----------------------------------------------------------------------------
 # - Spark
@@ -123,11 +125,20 @@ def dag_() -> None:
         },
     )
 
+    dbt_vars = format_dbt_vars(
+        {
+            "execution_date": f"{EXECUTION_DATE}",
+            "s3_bronze_path": f"s3://{S3_BUCKET}/bronze/insert_date=",
+        }
+    )
+
     dbt_transform = BashOperator(
         task_id="dbt_transform",
-        bash_command="cd /opt/airflow/dbt_transform && dbt run --profiles-dir .",
+        bash_command=f'cd /opt/airflow/dbt_transform && \
+            dbt run --vars {dbt_vars}',
         env={
             **os.environ.copy(),
+            "DBT_PROFILES_DIR": DBT_PROFILES_DIR,
             "POSTGRES_HOST": POSTGRES_HOST,
             "POSTGRES_USER": POSTGRES_USER,
             "POSTGRES_PASSWORD": POSTGRES_PASSWORD,

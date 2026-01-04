@@ -26,14 +26,14 @@ models:
       +materialized: view
     marts:
       +materialized: incremental
-      +incremental_strategy: merge
+      +incremental_strategy: delete+insert
 
 tests:
   +schema: metadata
   +store_failures: true
 
 vars:
-  execution_date: "{{ (modules.datetime.datetime.now()).strftime('%Y-%m-%d') }}"
+  execution_date: "2025-01-01"
   s3_bronze_path: "s3://flights-data-lake/bronze/insert_date="
 
   unit_tests_config:

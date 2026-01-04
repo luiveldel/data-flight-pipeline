@@ -4,7 +4,11 @@
     )
 }}
 
-with base as (
+with fct_flights as (
+    select * from {{ ref('fct_flights') }}
+),
+
+base as (
     select
         flight_date,
         dep_iata,
@@ -12,7 +16,7 @@ with base as (
         airline_iata,
         dep_delay_min,
         delay_category
-    from {{ ref('fct_flights') }}
+    from fct_flights
 ),
 
 agg as (
