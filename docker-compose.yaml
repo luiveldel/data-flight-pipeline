@@ -21,6 +21,8 @@ x-airflow-common:
     AVIATIONSTACK_API_KEY: "${AVIATIONSTACK_API_KEY}"
     AVIATIONSTACK_BASE_URL: "${AVIATIONSTACK_BASE_URL}"
     AVIATIONSTACK_LIMIT: "${AVIATIONSTACK_LIMIT}"
+    # OpenFlights
+    OPENFLIGHTS_BASE_URL: "${OPENFLIGHTS_BASE_URL}"
     # MinIO/S3 Configuration
     MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
     MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
@@ -35,6 +37,10 @@ x-airflow-common:
     POSTGRES_DB: "${POSTGRES_DB}"
     POSTGRES_PORT: 5432
     POSTGRES_SCHEMA: "${POSTGRES_SCHEMA:-public}"
+    # Spark/Python centralized config
+    PYTHONPATH: "/opt/airflow:/opt/airflow/dags"
+    PYSPARK_PYTHON: "/opt/airflow/.venv/bin/python3"
+    PYSPARK_DRIVER_PYTHON: "/opt/airflow/.venv/bin/python3"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./include:/opt/airflow/include
@@ -102,8 +108,8 @@ services:
     image: apache/spark:3.5.3
     command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
     environment:
-      - SPARK_WORKER_MEMORY=2G
-      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=4
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no

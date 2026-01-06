@@ -6,3 +6,21 @@ sources:
       - name: lnd_flights
         meta:
           external_location: "s3://flights-data-lake/bronze/insert_date={{ var('execution_date') }}/*.parquet"
+
+  - name: openflights_raw
+    tables:
+      - name: lnd_airports
+        meta:
+          external_location: "s3://flights-data-lake/bronze/openflights/airports.parquet"
+      - name: lnd_airlines
+        meta:
+          external_location: "s3://flights-data-lake/bronze/openflights/airlines.parquet"
+      - name: lnd_countries
+        meta:
+          external_location: "s3://flights-data-lake/bronze/openflights/countries.parquet"
+      - name: lnd_planes
+        meta:
+          external_location: "s3://flights-data-lake/bronze/openflights/planes.parquet"
+      - name: lnd_routes
+        meta:
+          external_location: "s3://flights-data-lake/bronze/openflights/routes.parquet"

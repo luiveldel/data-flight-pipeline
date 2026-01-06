@@ -29,15 +29,22 @@ LOCAL_BRONZE_PATH = "/opt/airflow/data/bronze"
 MAX_PAGES = 1
 
 # -----------------------------------------------------------------------------
-# - Postgres
+# - ETL
 # -----------------------------------------------------------------------------
-POSTGRES_USER = os.environ.get("POSTGRES_USER")
-POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
-POSTGRES_DB = os.environ.get("POSTGRES_DB")
-POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
-POSTGRES_URL = f"jdbc:postgresql://{POSTGRES_HOST}:5432/{POSTGRES_DB}"
+aviationstack_vars = json.dumps(
+    {
+        "raw_dir": f"s3a://{S3_BUCKET}/raw/insert_date={EXECUTION_DATE}",
+        "bronze_dir": f"s3a://{S3_BUCKET}/bronze/insert_date={EXECUTION_DATE}",
+        "max_pages": MAX_PAGES,
+    }
+)
 
-DBT_PROFILES_DIR = os.environ.get("DBT_PROFILES_DIR")
+openflights_vars = json.dumps(
+    {
+        "raw_dir": f"s3a://{S3_BUCKET}/raw/openflights",
+        "bronze_dir": f"s3a://{S3_BUCKET}/bronze/openflights",
+    }
+)
 
 # -----------------------------------------------------------------------------
 # - Spark
@@ -81,19 +88,12 @@ def dag_() -> None:
             {LOCAL_RAW_PATH} \
             --max-pages {MAX_PAGES} \
             --execution-date {EXECUTION_DATE}",
-        env={
-            **os.environ.copy(),
-            "PYTHONPATH": "/opt/airflow",
-        },
     )
 
     extract_openflights = BashOperator(
         task_id="extract_openflights_to_csv",
-        bash_command=f"python3 -m include openflights {LOCAL_RAW_PATH}/openflights/",
-        env={
-            **os.environ.copy(),
-            "PYTHONPATH": "/opt/airflow",
-        },
+        bash_command=f"python3 -m include openflights \
+            {LOCAL_RAW_PATH}/openflights/",
     )
 
     upload_raw_to_minio = upload_to_s3(
@@ -103,18 +103,18 @@ def dag_() -> None:
         remote_prefix="raw",
     )
 
-    spark_vars = json.dumps(
-        {
-            "raw_dir": f"s3a://{S3_BUCKET}/raw/insert_date={EXECUTION_DATE}",
-            "bronze_dir": f"s3a://{S3_BUCKET}/bronze/insert_date={EXECUTION_DATE}",
-            "max_pages": MAX_PAGES,
-        }
-    )
+    def run_etl(
+        *,
+        etl_name: str,
+        _vars: str | None = None,
+    ) -> BashOperator:
+        if _vars is None:
+            _vars = "{}"
 
-    spark_etl = BashOperator(
-        task_id="etl_aviationstack",
-        bash_command=f"""
-            /opt/airflow/.venv/bin/spark-submit \
+        return BashOperator(
+            task_id=f"etl_{etl_name}",
+            bash_command=f"""
+                /opt/airflow/.venv/bin/spark-submit \
                 --master {SPARK_MASTER_URL} \
                 --total-executor-cores 1 \
                 --executor-memory 512M \
@@ -123,16 +123,14 @@ def dag_() -> None:
                 --conf spark.hadoop.fs.s3a.secret.key={MINIO_SECRET_KEY} \
                 --conf spark.hadoop.fs.s3a.path.style.access=true \
                 --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem \
-                --conf spark.jars.packages=org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262 \
-                --name arrow-spark \
-                /opt/airflow/spark_jobs/main_cli.py aviationstack '{spark_vars}'
-        """,
-        env={
-            "PYTHONPATH": "/opt/airflow:/opt/airflow/dags:/opt/airflow/include",
-            "PYSPARK_PYTHON": "/opt/airflow/.venv/bin/python3",
-            "PYSPARK_DRIVER_PYTHON": "/opt/airflow/.venv/bin/python3",
-        },
-    )
+                --jars /opt/airflow/jars/hadoop-aws-3.3.4.jar,/opt/airflow/jars/aws-java-sdk-bundle-1.12.262.jar \
+                --name {etl_name}-etl \
+                /opt/airflow/spark_jobs/main_cli.py {etl_name} '{_vars}'
+            """,
+        )
+
+    etl_openflights = run_etl(etl_name="openflights", _vars=openflights_vars)
+    etl_aviationstack = run_etl(etl_name="aviationstack", _vars=aviationstack_vars)
 
     dbt_vars = format_dbt_vars(
         {
@@ -145,23 +143,14 @@ def dag_() -> None:
         task_id="dbt_transform",
         bash_command=f"cd /opt/airflow/dbt_transform && \
             dbt run --vars {dbt_vars}",
-        env={
-            **os.environ.copy(),
-            "DBT_PROFILES_DIR": DBT_PROFILES_DIR,
-            "POSTGRES_HOST": POSTGRES_HOST,
-            "POSTGRES_USER": POSTGRES_USER,
-            "POSTGRES_PASSWORD": POSTGRES_PASSWORD,
-            "POSTGRES_DB": POSTGRES_DB,
-        },
     )
 
     (
         start
         >> create_bucket
-        >> extract_api
-        >> extract_openflights
+        >> [extract_api, extract_openflights]
         >> upload_raw_to_minio
-        >> spark_etl
+        >> [etl_aviationstack, etl_openflights]
         >> dbt_transform
         >> end
     )

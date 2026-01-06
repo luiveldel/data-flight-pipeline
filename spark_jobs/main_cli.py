@@ -3,11 +3,14 @@ import json
 from enum import Enum
 import typer
 from pyspark.sql import SparkSession
-from spark_jobs.aviationstack._etl import AviationStackETL
-from spark_jobs.shared.base_etl import BaseETL
-from spark_jobs.shared.config import AviationStackParams
+from contextlib import contextmanager
 
-# Configure logging
+from spark_jobs.aviationstack._etl import AviationStackETL
+from spark_jobs.openflights._etl import OpenFlightsETL
+from spark_jobs.shared.base_etl import BaseETL
+from spark_jobs.shared.config import AviationStackParams, OpenFlightsParams
+
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -15,16 +18,33 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@contextmanager
+def spark_session(app_name: str) -> SparkSession:
+    """Reuse active or create a new SparkSession."""
+    spark = SparkSession.builder.appName(app_name).getOrCreate()
+
+    try:
+        yield spark
+    finally:
+        spark.stop()
+        SparkSession.clearActiveSession()
+        SparkSession.clearDefaultSession()
 
 class ETL(str, Enum):
     """Enum representing the various ETL processes available for execution."""
 
     AVIATIONSTACK = "aviationstack"
+    OPENFLIGHTS = "openflights"
 
 
 ETL_ENUM_TO_CLASS_DICT: dict[ETL, type[BaseETL]] = {
     ETL.AVIATIONSTACK: AviationStackETL,
-    # Add more ETLs here: ETL.OPENSKY
+    ETL.OPENFLIGHTS: OpenFlightsETL,
+}
+
+ETL_ENUM_TO_PARAMS_DICT: dict[ETL, type] = {
+    ETL.AVIATIONSTACK: AviationStackParams,
+    ETL.OPENFLIGHTS: OpenFlightsParams,
 }
 
 app = typer.Typer()
@@ -35,30 +55,19 @@ def main(etl: ETL, vars_: str) -> None:
     """Run an ETL."""
 
     etl_class = ETL_ENUM_TO_CLASS_DICT[etl]
+    params_class = ETL_ENUM_TO_PARAMS_DICT[etl]
 
-    # Parse JSON string into AviationStackParams
     config_dict = json.loads(vars_)
-    config = AviationStackParams(**config_dict)
-
-    spark: SparkSession = SparkSession.builder.appName(etl.value).getOrCreate()
-
-    # Ensure the SparkContext is not stopped
-    if spark.sparkContext._jsc is None or spark.sparkContext._jsc.version() is None:
-        logger.warning("SparkContext was stopped. Recreating...")
-        SparkSession.clearActiveSession()
-        SparkSession.clearDefaultSession()
-        spark = SparkSession.builder.appName(etl.value).getOrCreate()
+    config = params_class(**config_dict)
 
     logger.info(f"Starting ETL: {etl.value}")
     try:
-        etl_class(spark, config).run()
+        with spark_session(etl.value) as spark:
+            etl_class(spark, config).run()
         logger.info(f"ETL {etl.value} completed successfully.")
-    except Exception as e:
-        logger.error(f"ETL {etl.value} failed with error: {e}")
+    except Exception:
+        logger.exception(f"ETL {etl.value} failed")
         raise
-    finally:
-        logger.info("Stopping Spark session...")
-        spark.stop()
 
 
 if __name__ == "__main__":

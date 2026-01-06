@@ -1,6 +1,6 @@
 # Data Flight Pipeline
 
-End-to-end aviation ETL: AviationStack API → MinIO → PySpark → Airflow → dbt → MinIO → Metabase
+End-to-end aviation ETL: AviationStack API → MinIO → PySpark → Airflow → dbt → DuckDB → Metabase
 
 [![Docker Compose](https://img.shields.io/badge/docker-compose%20up-green)](docker-compose.yml)
 [![PySpark](https://img.shields.io/badge/PySpark-3.5-blue)](pyspark/)
@@ -8,12 +8,11 @@ End-to-end aviation ETL: AviationStack API → MinIO → PySpark → Airflow →
 
 ## 💻 Stack
 
-- 🛫 AviationStack API (free aviation data)
-    - Future releases: Add OpenFlights CSVs and OpenSky API
+- 🛫 AviationStack API (free aviation data) and OpenFlights CSVs
 - ⚡ PySpark ETL jobs
 - 🌊 Airflow DAGs orchestration
 - 🔄 dbt transformations + tests
-- 🗄️ MinIO S3 lake + Postgres
+- 🗄️ MinIO S3 lake + DuckDB
 - 📊 Metabase dashboards
 
 ## 💾 Storage
@@ -25,7 +24,7 @@ Free Oracle VPS (4 vCPUs, 32GB RAM, 200GB SSD)
 ## 🚀 Quickstart
 
 ```bash
-docker compose up -d
+make docker/up
 ```
 
 **Access to:**
@@ -35,11 +34,19 @@ docker compose up -d
 - **Metabase**: http://localhost:3000
 - **dbt docs**: http://localhost:8080/dbt-docs
 
-## 🛫 Dataset: Open Flights
+## 🛫 Dataset:
+
+### Aviation Stack
 
 Free aviation data from [https://aviationstack.com/](https://aviationstack.com/):
 
 - 100 requests/month limit
+
+### Open Flights
+
+Free datasets with airports, airlines, routes, etc.
+
+https://openflights.org/data.php
 
 ## 🏗️ Architecture
 
@@ -49,7 +56,7 @@ graph TB
     B --> C[PySpark ETL<br/>Clean + Aggregate]
     C --> D[MinIO S3 Lake<br/>bronze/silver/raw]
     D --> E[dbt Models<br/>dim_airports<br/>fact_flights]
-    E --> F[Postgres DWH]
+    E --> F[DuckDB DWH]
     F --> G[Metabase Dashboards<br/>Delays by Route<br/>Top Airlines]
 ```
 
@@ -59,7 +66,7 @@ graph TB
 | Processing     | PySpark 3.5              | ETL batch (dedup, joins, aggs) |
 | Orchestration  | Airflow 2.9              | Daily DAGs + SparkSubmit       |
 | Transformation | dbt 1.8                  | SQL models + tests             |
-| Storage        | MinIO (S3) + Postgres 15 | Lake + DWH                     |
+| Storage        | MinIO (S3) + DuckDB      | Lake + DWH                     |
 | Viz            | Metabase                 | Executive dashboards           |
 | Infra          | Docker Compose           | Local + VPS deploy             |
 
@@ -87,7 +94,7 @@ _(Screenshots post-setup)_
 docker compose --profile dev up
 
 # Run dbt manually
-docker compose exec dbt dbt run --models fact_flights
+docker compose exec dbt dbt run --models fct_flights
 
 # Test pipeline
 docker compose exec airflow airflow dags test flights_etl_dag 2025-12-20

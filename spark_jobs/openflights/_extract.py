@@ -10,6 +10,7 @@ def read_csv_no_header(spark: SparkSession, path: str) -> DataFrame:
         spark.read.option("header", "false")
         .option("inferSchema", "true")
         .option("mode", "DROPMALFORMED")
+        .option("encoding", "UTF-8")
         .csv(path)
     )
 

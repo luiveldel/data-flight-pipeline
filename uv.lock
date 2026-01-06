@@ -1046,7 +1046,7 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pyspark", specifier = "==3.5.3" },
     { name = "requests", specifier = "==2.32.3" },
-    { name = "typer", specifier = "==0.12.0" },
+    { name = "typer", specifier = "==0.12.5" },
 ]
 
 [package.metadata.requires-dev]
@@ -4614,46 +4614,17 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.12.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typer-cli" },
-    { name = "typer-slim", extra = ["standard"] },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/d0/3e/2b3a69a50fa8237e6c9c76ff08eeffcf7caad7e24e01d3762780544d8f9b/typer-0.12.0.tar.gz", hash = "sha256:900fe786ce2d0ea44653d3c8ee4594a22a496a3104370ded770c992c5e3c542d", size = 6105, upload-time = "2024-03-30T02:20:48.2Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d8/21/6a9c5c3363e30345346f59d236fd416730c2ac7802abe3609fed89d46ac1/typer-0.12.0-py3-none-any.whl", hash = "sha256:0441a0bb8962fb4383b8537ada9f7eb2d0deda0caa2cfe7387cc221290f617e4", size = 5572, upload-time = "2024-03-30T02:20:46.193Z" },
-]
-
-[[package]]
-name = "typer-cli"
-version = "0.12.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typer-slim", extra = ["standard"] },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/1f/f8/510dee64719ca34a91b3c33a2dac6bb53174885b3692ca7f08ea978a8ab3/typer_cli-0.12.0.tar.gz", hash = "sha256:603ed3d5a278827bd497e4dc73a39bb714b230371c8724090b0de2abdcdd9f6e", size = 3081, upload-time = "2024-03-30T02:20:44.354Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c1/11/a0a5c4ff576299b57a5012a618291ea3f64f75e187c6dec276944d5820a5/typer_cli-0.12.0-py3-none-any.whl", hash = "sha256:7b7e2dd49f59974bb5a869747045d5444b17bffb851e006cd424f602d3578104", size = 3045, upload-time = "2024-03-30T02:20:42.703Z" },
-]
-
-[[package]]
-name = "typer-slim"
-version = "0.12.0"
+version = "0.12.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/6a/25/b1f3b40acca4a9a263f37fa7f30a6d83b33d9b6182352e1e59e0898c664d/typer_slim-0.12.0.tar.gz", hash = "sha256:3e8a3f17286b173d76dca0fd4e02651c9a2ce1467b3754876b1ac4bd72572beb", size = 93041, upload-time = "2024-03-30T02:20:50.997Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/8d/cd24db348ffdec4e2331c293f63eb8492956879c0925dd05d1e747b49cc7/typer_slim-0.12.0-py3-none-any.whl", hash = "sha256:ddd7042b29a32140528caa415750bcae54113ba0c32270ca11a6f64069ddadf9", size = 46839, upload-time = "2024-03-30T02:20:48.976Z" },
-]
-
-[package.optional-dependencies]
-standard = [
     { name = "rich" },
     { name = "shellingham" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c5/58/a79003b91ac2c6890fc5d90145c662fd5771c6f11447f116b63300436bc9/typer-0.12.5.tar.gz", hash = "sha256:f592f089bedcc8ec1b974125d64851029c3b1af145f04aca64d69410f0c9b722", size = 98953, upload-time = "2024-08-24T21:17:57.346Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/2b/886d13e742e514f704c33c4caa7df0f3b89e5a25ef8db02aa9ca3d9535d5/typer-0.12.5-py3-none-any.whl", hash = "sha256:62fe4e471711b147e3365034133904df3e235698399bc4de2b36c8579298d52b", size = 47288, upload-time = "2024-08-24T21:17:55.451Z" },
 ]
 
 [[package]]

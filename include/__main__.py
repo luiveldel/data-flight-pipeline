@@ -8,9 +8,11 @@ app = typer.Typer()
 @app.command()
 def flights(
     raw_dir: str = typer.Argument(..., help="Local directory to save JSON files"),
-    max_pages: int = typer.Option(1, help="Maximum number of pages to fetch"),
+    max_pages: int = typer.Option(
+        1, "--max-pages", help="Maximum number of pages to fetch"
+    ),
     execution_date: str = typer.Option(
-        "1970-01-01", help="Execution date for partitioning"
+        "1970-01-01", "--execution-date", help="Execution date for partitioning"
     ),
 ) -> None:
     extract_api_flights(
