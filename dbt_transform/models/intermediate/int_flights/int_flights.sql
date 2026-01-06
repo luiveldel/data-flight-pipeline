@@ -3,13 +3,29 @@ with int_flights_kpis as (
 )
 
 select
-    {{ dbt_utils.generate_surrogate_key(['flight_iata_full', 'flight_date']) }} as flight_key,
-    flight_date,
+    {{ dbt_utils.generate_surrogate_key(['flight_iata_full', 'flight_date']) }} as flight_key,    flight_iata_full,
+    flight_number,
+    airline_iata,
     dep_iata,
     arr_iata,
-    airline_iata,
-    delay_category,
+    flight_date,
+    dep_scheduled,
+    dep_actual,
+    arr_scheduled,
+    arr_actual,
+    flight_status,
     dep_delay_min,
+    arr_delay_min,
+    day_of_week,
+    day_of_week_name,
+    is_weekend,
+    dep_hour,
+    time_of_day,
+    scheduled_duration_min,
+    actual_duration_min,
+    duration_diff_min,
+    delay_category,
+    is_delayed_15,
     avg(avg_delay) over (
         partition by dep_iata, arr_iata
         order by flight_date

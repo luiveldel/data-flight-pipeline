@@ -2,9 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 from pyspark.sql import SparkSession
 
-from .config import AviationStackParams
 
-
+Config = TypeVar("Config")
 ExtractedDataFrames = TypeVar("ExtractedDataFrames")
 TransformedDataFrames = TypeVar("TransformedDataFrames")
 
@@ -14,11 +13,12 @@ class BaseETL(
     Generic[
         ExtractedDataFrames,
         TransformedDataFrames,
+        Config,
     ],
 ):
     """Base class for implementing an ETL process."""
 
-    def __init__(self, spark: SparkSession, config: AviationStackParams) -> None:
+    def __init__(self, spark: SparkSession, config: Config) -> None:
         self._spark = spark
         self._config = config
 

@@ -1,5 +1,5 @@
-from pyspark.sql import DataFrame
 import logging
+from pyspark.sql import DataFrame
 
 from spark_jobs.shared.config import AviationStackParams
 

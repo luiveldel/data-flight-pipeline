@@ -32,8 +32,6 @@ def verify_etl():
     if os.path.exists(bronze_dir):
         shutil.rmtree(bronze_dir)
 
-    os.makedirs(raw_dir, exist_ok=True)
-
     # Create dummy data file
     dummy_data = {
         "pagination": {"limit": 100, "offset": 0, "count": 1, "total": 1},

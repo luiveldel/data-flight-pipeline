@@ -9,17 +9,16 @@ with source as (
 )
 
 select
-    '{{ var("execution_date") }}'::date as insert_date_ci,
     flight_date::date as flight_date,
     flight_status::varchar(20) as flight_status,
     dep_airport::varchar(100) as dep_airport,
     dep_iata::varchar(3) as dep_iata,
     dep_scheduled::timestamp as dep_scheduled,
-    dep_actual as dep_actual,
+    dep_actual::timestamp as dep_actual,
     arr_airport::varchar(100) as arr_airport,
     arr_iata::varchar(3) as arr_iata,
     arr_scheduled::timestamp as arr_scheduled,
-    arr_actual as arr_actual,
+    arr_actual::timestamp as arr_actual,
     airline_iata::varchar(3) as airline_iata,
     flight_number::varchar(10) as flight_number,
     airline_iata || flight_number as flight_iata_full,

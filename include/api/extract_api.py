@@ -21,7 +21,6 @@ def extract_flights(
     client = FlightsClient()
 
     partition_dir = os.path.join(raw_dir, f"insert_date={execution_date}")
-    os.makedirs(partition_dir, exist_ok=True)
 
     first = client.get_aviationstack_json_response(
         endpoint="/flights",

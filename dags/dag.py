@@ -77,10 +77,19 @@ def dag_() -> None:
     # TODO: refactor this task, it's not airflow-y, it's just a bash command
     extract_api = BashOperator(
         task_id="extract_api_to_json",
-        bash_command=f"python3 -m include.api \
+        bash_command=f"python3 -m include flights \
             {LOCAL_RAW_PATH} \
-            {MAX_PAGES} \
-            {EXECUTION_DATE}",
+            --max-pages {MAX_PAGES} \
+            --execution-date {EXECUTION_DATE}",
+        env={
+            **os.environ.copy(),
+            "PYTHONPATH": "/opt/airflow",
+        },
+    )
+
+    extract_openflights = BashOperator(
+        task_id="extract_openflights_to_csv",
+        bash_command=f"python3 -m include openflights {LOCAL_RAW_PATH}/openflights/",
         env={
             **os.environ.copy(),
             "PYTHONPATH": "/opt/airflow",
@@ -90,8 +99,8 @@ def dag_() -> None:
     upload_raw_to_minio = upload_to_s3(
         task_id="upload_raw_to_minio",
         bucket=S3_BUCKET,
-        local_path=f"{LOCAL_RAW_PATH}/insert_date={EXECUTION_DATE}",
-        remote_prefix=f"raw/insert_date={EXECUTION_DATE}",
+        local_path=LOCAL_RAW_PATH,
+        remote_prefix="raw",
     )
 
     spark_vars = json.dumps(
@@ -134,8 +143,8 @@ def dag_() -> None:
 
     dbt_transform = BashOperator(
         task_id="dbt_transform",
-        bash_command=f'cd /opt/airflow/dbt_transform && \
-            dbt run --vars {dbt_vars}',
+        bash_command=f"cd /opt/airflow/dbt_transform && \
+            dbt run --vars {dbt_vars}",
         env={
             **os.environ.copy(),
             "DBT_PROFILES_DIR": DBT_PROFILES_DIR,
@@ -150,6 +159,7 @@ def dag_() -> None:
         start
         >> create_bucket
         >> extract_api
+        >> extract_openflights
         >> upload_raw_to_minio
         >> spark_etl
         >> dbt_transform

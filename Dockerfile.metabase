@@ -1,0 +1,17 @@
+FROM eclipse-temurin:21-jre
+
+# Standardizing on /metabase for all flight-related metadata
+ENV MB_PLUGINS_DIR=/metabase/plugins
+RUN mkdir -p ${MB_PLUGINS_DIR} /app
+
+# Latest Metabase
+RUN mkdir -p /app && \
+  curl -L -o /app/metabase.jar \
+  https://downloads.metabase.com/latest/metabase.jar
+
+# Latest DuckDB driver
+RUN curl -L -o ${MB_PLUGINS_DIR}/duckdb.metabase-driver.jar \
+  https://github.com/MotherDuck-Open-Source/metabase_duckdb_driver/releases/latest/download/duckdb.metabase-driver.jar
+
+EXPOSE 3000
+CMD ["java", "-jar", "/app/metabase.jar"]

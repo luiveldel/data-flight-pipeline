@@ -30,11 +30,19 @@ def upload_to_s3(
         aws_conn_id: str = aws_conn_id,
     ) -> None:
         s3_hook = S3Hook(aws_conn_id=aws_conn_id, verify=None)
-        for filename in os.listdir(local_path):
-            if filename.endswith(".json"):
-                local_file = os.path.join(local_path, filename)
-                remote_key = f"{remote_prefix}/{filename}"
-                logger.info(f"Uploading local file {local_file} to s3://{bucket}/{remote_key}")
+
+        for root, _, files in os.walk(local_path):
+            for filename in files:
+                local_file = os.path.join(root, filename)
+                # Calculate relative path from local_path to preserve structure in S3
+                relative_path = os.path.relpath(local_file, local_path)
+                remote_key = os.path.join(remote_prefix, relative_path).replace(
+                    os.sep, "/"
+                )
+
+                logger.info(
+                    f"Uploading local file {local_file} to s3://{bucket}/{remote_key}"
+                )
                 s3_hook.load_file(
                     filename=local_file,
                     key=remote_key,

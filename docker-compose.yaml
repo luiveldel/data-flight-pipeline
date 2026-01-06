@@ -2,7 +2,8 @@ x-airflow-common:
   &airflow-common
   build:
     context: .
-    dockerfile: Dockerfile
+    dockerfile: Dockerfile.airflow
+    target: airflow
   environment:
     &airflow-common-env
     PATH: "/opt/airflow/.venv/bin:/home/airflow/.local/bin:/usr/local/bin:/usr/bin:/bin"
@@ -28,7 +29,7 @@ x-airflow-common:
     # dbt Configuration
     DBT_PROFILES_DIR: /opt/airflow/dbt_transform
     # Postgres for dbt (Gold Marts)
-    POSTGRES_HOST: postgres
+    POSTGRES_HOST: "${POSTGRES_HOST}"
     POSTGRES_USER: "${POSTGRES_USER}"
     POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     POSTGRES_DB: "${POSTGRES_DB}"
@@ -152,17 +153,17 @@ services:
       interval: 30s
       timeout: 30s
       retries: 5
-    restart: always
+    restart: unless-stopped
 
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
-    restart: always
+    restart: unless-stopped
 
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
-    restart: always
+    restart: unless-stopped
 
   airflow-init:
     <<: *airflow-common
@@ -180,10 +181,37 @@ services:
     depends_on:
       - postgres
 
+  metabase:
+    build:
+      context: .
+      dockerfile: Dockerfile.metabase
+    environment:
+      MB_PLUGINS_DIR: /metabase/plugins
+      MB_DB_FILE: /metabase-data/metabase.db
+    volumes:
+      - metabase-data:/metabase-data
+      - ./data:/data:ro   # for .duckdb
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  # caddy:
+  #   image: caddy:2
+  #   container_name: caddy
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile:ro
+  #     - caddy-data:/data
+  #     - caddy-config:/config
+  #   restart: unless-stopped
+
 volumes:
   airflow-uv-venv:
   postgres-db-volume:
   minio-data:
+  metabase-data:
   data_volume:
     driver: local
     driver_opts:

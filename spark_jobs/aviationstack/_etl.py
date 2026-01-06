@@ -1,9 +1,10 @@
+from typing import NamedTuple
+from pyspark.sql import DataFrame
+
 from spark_jobs.aviationstack._load import load_flights
 from spark_jobs.aviationstack._transform import transform_flights
-from typing import NamedTuple
-
-from pyspark.sql import DataFrame
 from spark_jobs.shared.base_etl import BaseETL
+from spark_jobs.shared.config import AviationStackParams
 
 
 class AviationStackDataframes(NamedTuple):
@@ -12,7 +13,9 @@ class AviationStackDataframes(NamedTuple):
     aviationstack_json_df: DataFrame
 
 
-class AviationStackETL(BaseETL[AviationStackDataframes, DataFrame]):
+class AviationStackETL(
+    BaseETL[AviationStackDataframes, DataFrame, AviationStackParams]
+):
     """ETL class for aviationstack."""
 
     def _extract(self) -> AviationStackDataframes:
