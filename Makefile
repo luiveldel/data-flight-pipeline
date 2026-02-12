@@ -6,7 +6,7 @@ docker/build:
 
 .PHONY: docker/up
 docker/up:
-	docker compose up -d
+	docker compose up -d && export $$(grep -v '^#' .env | xargs)
 
 .PHONY: docker/down
 docker/down:
@@ -14,8 +14,16 @@ docker/down:
 
 .PHONY: docker/restart
 docker/restart:
-docker compose down && docker compose up -d
+	docker compose down && docker compose up -d
 
-.PHONY: uv/api
-uv/api:
-	export $$(grep -v '^#' .env | xargs) && uv run python -m include.api data/raw 1 2025-12-24
+.PHONY: uv/flights
+uv/flights:
+	uv run python -m include flights \
+		data/raw \
+		--max-pages 1 \
+		--execution-date 2025-12-24
+
+.PHONY: uv/openflights
+uv/openflights:
+	uv run python -m include openflights \
+		data/raw/openflights

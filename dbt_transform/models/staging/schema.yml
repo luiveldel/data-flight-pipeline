@@ -1,0 +1,162 @@
+version: 2
+
+models:
+  - name: stg_lnd_flights
+    description: "Staged flight data from AviationStack API. Contains flight schedules, delays, and status information."
+    columns:
+      - name: flight_date
+        description: "The date of the flight"
+        tests:
+          - not_null
+      - name: flight_status
+        description: "Current status of the flight (scheduled, active, landed, cancelled, etc.)"
+      - name: dep_airport
+        description: "Departure airport name"
+      - name: dep_iata
+        description: "Departure airport IATA code (3 characters)"
+        tests:
+          - not_null
+      - name: dep_scheduled
+        description: "Scheduled departure timestamp"
+      - name: dep_actual
+        description: "Actual departure timestamp"
+      - name: arr_airport
+        description: "Arrival airport name"
+      - name: arr_iata
+        description: "Arrival airport IATA code (3 characters)"
+        tests:
+          - not_null
+      - name: arr_scheduled
+        description: "Scheduled arrival timestamp"
+      - name: arr_actual
+        description: "Actual arrival timestamp"
+      - name: airline_iata
+        description: "Airline IATA code (2 characters)"
+      - name: flight_number
+        description: "Flight number"
+      - name: flight_iata_full
+        description: "Full flight code (airline IATA + flight number)"
+      - name: dep_delay_min
+        description: "Departure delay in minutes (negative if early)"
+      - name: arr_delay_min
+        description: "Arrival delay in minutes (negative if early)"
+      - name: dep_scheduled_ts
+        description: "Scheduled departure as timestamp"
+      - name: arr_scheduled_ts
+        description: "Scheduled arrival as timestamp"
+      - name: ingestion_date
+        description: "Date when the data was ingested into the pipeline"
+        tests:
+          - not_null
+
+  - name: stg_lnd_airlines
+    description: "Staged airline reference data from OpenFlights. Contains airline identification and status."
+    columns:
+      - name: airline_id
+        description: "Unique OpenFlights identifier for the airline"
+        tests:
+          - unique
+          - not_null
+      - name: airline_name
+        description: "Full name of the airline"
+        tests:
+          - not_null
+      - name: airline_alias
+        description: "Alternative name or alias for the airline"
+      - name: iata_code
+        description: "2-letter IATA code (may be null for some airlines)"
+      - name: icao_code
+        description: "3-letter ICAO code"
+      - name: airline_callsign
+        description: "Radio callsign used by the airline"
+      - name: country
+        description: "Country where the airline is incorporated"
+      - name: is_active
+        description: "Whether the airline is currently active (Y/N)"
+        tests:
+          - accepted_values:
+              values: ['Y', 'N', '']
+
+  - name: stg_lnd_airports
+    description: "Staged airport reference data from OpenFlights. Contains airport location and identification."
+    columns:
+      - name: airport_id
+        description: "Unique OpenFlights identifier for the airport"
+        tests:
+          - unique
+          - not_null
+      - name: airport_name
+        description: "Full name of the airport"
+        tests:
+          - not_null
+      - name: airport_city
+        description: "City where the airport is located"
+      - name: airport_country
+        description: "Country where the airport is located"
+      - name: airport_iata_code
+        description: "3-letter IATA code"
+      - name: airport_icao_code
+        description: "4-letter ICAO code"
+      - name: airport_latitude
+        description: "Latitude in decimal degrees"
+      - name: airport_longitude
+        description: "Longitude in decimal degrees"
+      - name: airport_altitude_feet
+        description: "Altitude in feet"
+      - name: airport_timezone
+        description: "Hours offset from UTC"
+      - name: daylight_saving_time
+        description: "Daylight saving time zone (E=Europe, A=US/Canada, etc.)"
+      - name: airport_tz_database_time_zone
+        description: "Timezone in tz database format (e.g., America/Los_Angeles)"
+      - name: airport_type
+        description: "Type of airport (airport, station, etc.)"
+      - name: airport_source
+        description: "Data source for this airport record"
+
+  - name: stg_lnd_countries
+    description: "Staged country reference data from OpenFlights."
+    columns:
+      - name: name
+        description: "Country name"
+        tests:
+          - not_null
+          - unique
+      - name: iso_code
+        description: "ISO 3166-1 country code"
+      - name: dafif_code
+        description: "DAFIF country code"
+
+  - name: stg_lnd_planes
+    description: "Staged aircraft/plane reference data from OpenFlights."
+    columns:
+      - name: name
+        description: "Aircraft model name"
+        tests:
+          - not_null
+      - name: iata_code
+        description: "IATA aircraft type code"
+      - name: icao_code
+        description: "ICAO aircraft type code"
+
+  - name: stg_lnd_routes
+    description: "Staged route reference data from OpenFlights. Contains airline route information."
+    columns:
+      - name: airline
+        description: "Airline IATA code or ICAO code"
+      - name: airline_id
+        description: "OpenFlights airline ID"
+      - name: source_airport
+        description: "Source airport IATA or ICAO code"
+      - name: source_airport_id
+        description: "OpenFlights source airport ID"
+      - name: destination_airport
+        description: "Destination airport IATA or ICAO code"
+      - name: destination_airport_id
+        description: "OpenFlights destination airport ID"
+      - name: codeshare
+        description: "Whether this is a codeshare route (Y if codeshare)"
+      - name: stops
+        description: "Number of stops on this route"
+      - name: equipment
+        description: "Aircraft types used on this route"

@@ -67,7 +67,7 @@ def get_datasets_spec() -> List[OpenFlightSpec]:
         OpenFlightSpec(
             name="countries",
             filename="countries.dat",
-            columns=["name", "iso_code"],
+            columns=["name", "iso_code", "dafif_code"],
         ),
     ]
 

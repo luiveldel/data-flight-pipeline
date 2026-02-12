@@ -7,6 +7,8 @@ x-airflow-common:
   environment:
     &airflow-common-env
     PATH: "/opt/airflow/.venv/bin:/home/airflow/.local/bin:/usr/local/bin:/usr/bin:/bin"
+    AIRFLOW__WEBSERVER__SECRET_KEY: "${AIRFLOW__WEBSERVER__SECRET_KEY}"
+    AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/airflow/logs
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__FERNET_KEY: ''
@@ -122,6 +124,24 @@ services:
         - ./spark_jobs:/opt/airflow/spark_jobs
         - data_volume:/opt/airflow/data
 
+  spark-worker-2:
+    image: apache/spark:3.5.3
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
+    environment:
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=4
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "8090:8081"
+    depends_on:
+      - spark-master
+    volumes:
+        - ./spark_jobs:/opt/airflow/spark_jobs
+        - data_volume:/opt/airflow/data
+
   spark-thriftserver:
     image: apache/spark:3.5.3
     container_name: spark-thriftserver
@@ -140,6 +160,8 @@ services:
       --class org.apache.spark.sql.hive.thriftserver.HiveThriftServer2
       --master ${SPARK_MASTER_URL}
       --name Thrift-JDBC-ODBC-Server
+      --total-executor-cores 1
+      --executor-memory 1g
       --conf spark.hadoop.fs.s3a.endpoint=${MINIO_ENDPOINT}
       --conf spark.hadoop.fs.s3a.access.key=${MINIO_ACCESS_KEY}
       --conf spark.hadoop.fs.s3a.secret.key=${MINIO_SECRET_KEY}
@@ -196,7 +218,7 @@ services:
       MB_DB_FILE: /metabase-data/metabase.db
     volumes:
       - metabase-data:/metabase-data
-      - ./data:/data:ro   # for .duckdb
+      - ./data:/data   # for .duckdb
     ports:
       - "3000:3000"
     restart: unless-stopped

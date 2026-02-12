@@ -14,13 +14,14 @@ class FlightsClient(AviationStack):
 
 
 def extract_flights(
-    raw_dir: str = "/opt/airflow/data/raw",
+    raw_dir: str = "data/raw",
     max_pages: int = 1,
     execution_date: str = "1970-01-01",
 ) -> List[str]:
     client = FlightsClient()
 
     partition_dir = os.path.join(raw_dir, f"insert_date={execution_date}")
+    os.makedirs(partition_dir, exist_ok=True)
 
     first = client.get_aviationstack_json_response(
         endpoint="/flights",

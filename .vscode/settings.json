@@ -1,3 +1,10 @@
 {
-    "dbt.perspectiveTheme": "Pro Dark"
+    "files.watcherExclude": {
+        "**/.venv/**": true,
+        "**/.git/objects/**": true,
+        "**/logs/**": true
+    },
+    "files.exclude": {
+        "**/.venv": true
+    }
 }

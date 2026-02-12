@@ -1,0 +1,107 @@
+version: 2
+
+models:
+  - name: fct_flights
+    description: "Fact table containing all flight records with KPIs and analytics dimensions. Incrementally updated."
+    meta:
+      owner: "lavelazquezd@proton.me"
+      contains_pii: false
+    columns:
+      - name: insert_date_ci
+        description: "Date when the record was inserted (based on execution_date variable)"
+        tests:
+          - not_null
+      - name: flight_key
+        description: "Surrogate key uniquely identifying each flight on a given date"
+        tests:
+          - unique
+          - not_null
+      - name: flight_iata_full
+        description: "Full IATA flight code (airline + number)"
+        tests:
+          - not_null
+      - name: flight_date
+        description: "Date of the flight"
+        tests:
+          - not_null
+      - name: dep_iata
+        description: "Departure airport IATA code"
+        tests:
+          - not_null
+      - name: arr_iata
+        description: "Arrival airport IATA code"
+        tests:
+          - not_null
+      - name: airline_iata
+        description: "Airline IATA code"
+      - name: flight_number
+        description: "Flight number"
+      - name: dep_scheduled
+        description: "Scheduled departure time"
+      - name: dep_actual
+        description: "Actual departure time"
+      - name: arr_scheduled
+        description: "Scheduled arrival time"
+      - name: arr_actual
+        description: "Actual arrival time"
+      - name: flight_status
+        description: "Current flight status"
+      - name: dep_delay_min
+        description: "Departure delay in minutes"
+      - name: arr_delay_min
+        description: "Arrival delay in minutes"
+      - name: day_of_week
+        description: "Day of week (0-6)"
+      - name: day_of_week_name
+        description: "Day name"
+      - name: is_weekend
+        description: "Weekend indicator"
+      - name: dep_hour
+        description: "Departure hour (0-23)"
+      - name: time_of_day
+        description: "Time of day category"
+      - name: scheduled_duration_min
+        description: "Scheduled flight duration in minutes"
+      - name: actual_duration_min
+        description: "Actual flight duration in minutes"
+      - name: duration_diff_min
+        description: "Difference between actual and scheduled duration"
+      - name: delay_category
+        description: "Categorized delay severity"
+      - name: is_delayed_15
+        description: "Flag indicating delay over 15 minutes"
+      - name: avg_delay_7d
+        description: "7-day rolling average delay for the route"
+
+  - name: fct_route_daily
+    description: "Daily route aggregation showing flight counts and delay statistics per route/airline combination."
+    meta:
+      owner: "lavelazquezd@proton.me"
+      contains_pii: false
+    columns:
+      - name: flight_date
+        description: "Date of the aggregated flights"
+        tests:
+          - not_null
+      - name: route
+        description: "Route identifier (departure-arrival IATA codes)"
+        tests:
+          - not_null
+      - name: dep_iata
+        description: "Departure airport IATA code"
+        tests:
+          - not_null
+      - name: arr_iata
+        description: "Arrival airport IATA code"
+        tests:
+          - not_null
+      - name: airline_iata
+        description: "Airline IATA code"
+      - name: total_flights
+        description: "Total number of flights on this route/date"
+        tests:
+          - not_null
+      - name: avg_dep_delay_min
+        description: "Average departure delay in minutes"
+      - name: delayed_pct
+        description: "Percentage of flights with moderate or severe delays"

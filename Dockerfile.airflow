@@ -10,6 +10,7 @@ RUN apt-get update \
   python3-dev \
   libpq-dev \
   curl \
+  procps \
   && apt-get autoremove -yqq --purge \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
@@ -20,8 +21,10 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # Pre-download Spark JARs for S3 connectivity
 RUN mkdir -p /opt/airflow/jars && \
-  curl -L -o /opt/airflow/jars/hadoop-aws-3.3.4.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar && \
-  curl -L -o /opt/airflow/jars/aws-java-sdk-bundle-1.12.262.jar https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar && \
+  curl -L -o /opt/airflow/jars/hadoop-aws-3.3.4.jar \
+    https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar && \
+  curl -L -o /opt/airflow/jars/aws-java-sdk-bundle-1.12.262.jar \
+    https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar && \
   chown -R airflow:0 /opt/airflow/jars
 
 # install uv

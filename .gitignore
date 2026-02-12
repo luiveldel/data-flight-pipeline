@@ -1,8 +1,9 @@
 .env
 .pyproject.toml
-.venv
-logs
-__pycache__
+.venv/
+.vscode/
+logs/
+__pycache__/
 
 # DBT specific files
 dbt_transform/target/

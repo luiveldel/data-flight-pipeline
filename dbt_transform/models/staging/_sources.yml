@@ -2,25 +2,46 @@ version: 2
 
 sources:
   - name: flights_raw
+    description: "Raw flight data from AviationStack API stored in S3/MinIO bronze layer"
+    meta:
+      owner: "lavelazquezd@proton.me"
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    loaded_at_field: "ingestion_date::timestamp"
     tables:
       - name: lnd_flights
+        description: "Landing table for flight data extracted from AviationStack API"
         meta:
           external_location: "s3://flights-data-lake/bronze/insert_date={{ var('execution_date') }}/*.parquet"
+        columns:
+          - name: flight_date
+            description: "Date of the flight"
+          - name: ingestion_date
+            description: "Date when data was ingested"
 
   - name: openflights_raw
+    description: "Reference data from OpenFlights project stored in S3/MinIO bronze layer"
+    meta:
+      owner: "lavelazquezd@proton.me"
     tables:
       - name: lnd_airports
+        description: "Airport reference data including location and timezone information"
         meta:
-          external_location: "s3://flights-data-lake/bronze/openflights/airports.parquet"
+          external_location: "s3://flights-data-lake/bronze/openflights/airports.parquet/*.parquet"
       - name: lnd_airlines
+        description: "Airline reference data including codes and operational status"
         meta:
-          external_location: "s3://flights-data-lake/bronze/openflights/airlines.parquet"
+          external_location: "s3://flights-data-lake/bronze/openflights/airlines.parquet/*.parquet"
       - name: lnd_countries
+        description: "Country reference data with ISO and DAFIF codes"
         meta:
-          external_location: "s3://flights-data-lake/bronze/openflights/countries.parquet"
+          external_location: "s3://flights-data-lake/bronze/openflights/countries.parquet/*.parquet"
       - name: lnd_planes
+        description: "Aircraft type reference data with IATA and ICAO codes"
         meta:
-          external_location: "s3://flights-data-lake/bronze/openflights/planes.parquet"
+          external_location: "s3://flights-data-lake/bronze/openflights/planes.parquet/*.parquet"
       - name: lnd_routes
+        description: "Airline route data connecting airports"
         meta:
-          external_location: "s3://flights-data-lake/bronze/openflights/routes.parquet"
+          external_location: "s3://flights-data-lake/bronze/openflights/routes.parquet/*.parquet"
