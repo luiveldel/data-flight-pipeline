@@ -27,3 +27,38 @@ uv/flights:
 uv/openflights:
 	uv run python -m include openflights \
 		data/raw/openflights
+
+.PHONY: dbt/run
+dbt/run:
+	@echo "Loading environment variables from .env..."
+	@set -a && source .env && set +a && cd dbt_transform && uv run dbt run
+
+.PHONY: dbt/test
+dbt/test:
+	@set -a && source .env && set +a && cd dbt_transform && uv run dbt test
+
+.PHONY: dbt/debug
+dbt/debug:
+	@set -a && source .env && set +a && cd dbt_transform && uv run dbt debug
+
+.PHONY: metabase/setup-dashboard
+metabase/setup-dashboard:
+	@echo "Setting up Metabase dashboard..."
+	@echo "Usage: make metabase/setup-dashboard EMAIL=admin@example.com PASSWORD=yourpassword"
+	@if [ -z "$(EMAIL)" ] || [ -z "$(PASSWORD)" ]; then \
+		echo "Error: EMAIL and PASSWORD are required"; \
+		echo "Example: make metabase/setup-dashboard EMAIL=admin@example.com PASSWORD=admin123"; \
+		exit 1; \
+	fi
+	uv run python metabase/setup_dashboard.py \
+		--url http://localhost:3000 \
+		--email $(EMAIL) \
+		--password $(PASSWORD)
+
+.PHONY: test
+test:
+	uv run pytest tests/ spark_jobs/tests/ -v
+
+.PHONY: lint
+lint:
+	uv run sqlfluff lint dbt_transform/models/
