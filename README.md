@@ -100,6 +100,37 @@ docker compose exec dbt dbt run --models fct_flights
 docker compose exec airflow airflow dags test flights_etl_dag 2025-12-20
 ```
 
+## 🚀 Production Deployment
+
+The project auto-deploys to VPS via GitHub Actions on push to `main`.
+
+### Prerequisites
+
+1. **GitHub Secrets** (Settings > Secrets > Actions):
+   - `VPS_HOST`: VPS IP address
+   - `VPS_USER`: SSH username (e.g., `ubuntu`)
+   - `SSH_PRIVATE_KEY`: Full content of your SSH private key
+
+2. **DNS Records**: Point your domains to VPS IP
+   - `meta.yourdomain.com` → Metabase
+   - `airflow.yourdomain.com` → Airflow
+
+### Caddy Configuration
+
+Add to your existing Caddyfile in `vps-infrastructure`:
+
+```
+meta.luisandresvelazquez.com {
+    reverse_proxy metabase:3000
+}
+
+airflow.luisandresvelazquez.com {
+    reverse_proxy airflow-webserver:8080
+}
+```
+
+Services connect via shared Docker network `web_proxy`.
+
 ## 📈 Pipeline Metrics (🚧 WIP)
 
 | Metric        | Value      | dbt Test              |
