@@ -176,16 +176,13 @@ services:
     container_name: airflow-webserver
     command: webserver
     ports:
-      - "127.0.0.1:8080:8080"  # Only accessible locally, Caddy proxies externally
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
       timeout: 30s
       retries: 5
     restart: unless-stopped
-    networks:
-      - default
-      - web_proxy
 
   airflow-scheduler:
     <<: *airflow-common
@@ -223,13 +220,10 @@ services:
       MB_DB_FILE: /metabase-data/metabase.db
     volumes:
       - metabase-data:/metabase-data
-      - ./data:/data   # for .duckdb
+      - ./data:/data
     ports:
-      - "127.0.0.1:3000:3000"  # Only accessible locally, Caddy proxies externally
+      - "3000:3000"
     restart: unless-stopped
-    networks:
-      - default
-      - web_proxy
 
 volumes:
   airflow-uv-venv:
@@ -243,6 +237,3 @@ volumes:
       o: 'bind'
       device: '${PWD}/data'
 
-networks:
-  web_proxy:
-    external: true

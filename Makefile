@@ -66,3 +66,16 @@ lint:
 .PHONY: lint/fix
 lint/fix:
 	uv run sqlfluff fix dbt_transform/models/
+
+# Production commands (Metabase only)
+.PHONY: prod/up
+prod/up:
+	docker compose -f docker-compose.prod.yaml up -d --build
+
+.PHONY: prod/down
+prod/down:
+	docker compose -f docker-compose.prod.yaml down
+
+.PHONY: prod/logs
+prod/logs:
+	docker compose -f docker-compose.prod.yaml logs -f

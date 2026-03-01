@@ -100,36 +100,66 @@ docker compose exec dbt dbt run --models fct_flights
 docker compose exec airflow airflow dags test flights_etl_dag 2025-12-20
 ```
 
-## 🚀 Production Deployment
+## 🚀 Deployment Architecture
 
-The project auto-deploys to VPS via GitHub Actions on push to `main`.
+The project has two deployment modes:
 
-### Prerequisites
+| Mode | Docker Compose | Services | Purpose |
+|------|----------------|----------|---------|
+| **Development** | `docker-compose.yaml` | All (Airflow, Spark, MinIO, Metabase) | Local development & pipeline execution |
+| **Production** | `docker-compose.prod.yaml` | Metabase only | Self-service dashboards via web |
 
-1. **GitHub Secrets** (Settings > Secrets > Actions):
-   - `VPS_HOST`: VPS IP address
-   - `VPS_USER`: SSH username (e.g., `ubuntu`)
-   - `SSH_PRIVATE_KEY`: Full content of your SSH private key
+### Development (Local)
 
-2. **DNS Records**: Point your domains to VPS IP
-   - `meta.yourdomain.com` → Metabase
-   - `airflow.yourdomain.com` → Airflow
+```bash
+make docker/up          # Start all services
+make dbt/run            # Transform data
+make metabase/setup-dashboard EMAIL=... PASSWORD=...
+```
+
+Access:
+- Airflow: http://localhost:8080
+- Metabase: http://localhost:3000
+- Spark UI: http://localhost:8081
+
+### Production (VPS)
+
+Only Metabase is deployed to production for self-service analytics. Airflow and the full pipeline run locally.
+
+```bash
+make prod/up            # Start Metabase only
+make prod/down          # Stop
+make prod/logs          # View logs
+```
+
+Auto-deploys via GitHub Actions on push to `main`.
+
+### GitHub Secrets
+
+Configure in Settings > Secrets > Actions:
+- `VPS_HOST`: VPS IP address
+- `VPS_USER`: SSH username (e.g., `ubuntu`)
+- `SSH_PRIVATE_KEY`: Full content of SSH private key
 
 ### Caddy Configuration
 
-Add to your existing Caddyfile in `vps-infrastructure`:
+Add to your Caddyfile in `vps-infrastructure`:
 
 ```
 meta.luisandresvelazquez.com {
     reverse_proxy metabase:3000
 }
-
-airflow.luisandresvelazquez.com {
-    reverse_proxy airflow-webserver:8080
-}
 ```
 
 Services connect via shared Docker network `web_proxy`.
+
+### Data Sync
+
+The `data/analytics.duckdb` file must be synced to production after running the pipeline locally:
+
+```bash
+scp data/analytics.duckdb user@vps:~/data-flight-pipeline/data/
+```
 
 ## 📈 Pipeline Metrics (🚧 WIP)
 

@@ -1,0 +1,28 @@
+# Production Docker Compose - Metabase self-service only
+# Use: docker compose -f docker-compose.prod.yaml up -d
+
+services:
+  metabase:
+    build:
+      context: .
+      dockerfile: Dockerfile.metabase
+    container_name: metabase
+    environment:
+      MB_PLUGINS_DIR: /metabase/plugins
+      MB_DB_FILE: /metabase-data/metabase.db
+    volumes:
+      - metabase-data:/metabase-data
+      - ./data:/data
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    networks:
+      - default
+      - web_proxy
+
+volumes:
+  metabase-data:
+
+networks:
+  web_proxy:
+    external: true
