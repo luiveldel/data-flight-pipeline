@@ -4,7 +4,8 @@ with int_flights_kpis as (
 
 avg_delay_7d as (
     select
-        {{ dbt_utils.generate_surrogate_key(['flight_iata_full', 'flight_date']) }} as flight_key,    flight_iata_full,
+        {{ dbt_utils.generate_surrogate_key(['flight_iata_full', 'flight_date']) }} as flight_key,
+        flight_iata_full,
         flight_number,
         airline_iata,
         dep_iata,
@@ -33,7 +34,8 @@ avg_delay_7d as (
             rows between 6 preceding and current row
         ) as avg_delay_7d
     from int_flights_kpis
-        qualify row_number() over (
+    qualify
+        row_number() over (
             partition by flight_iata_full, flight_date
             order by ingestion_date desc
         ) = 1

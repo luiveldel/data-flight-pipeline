@@ -1,17 +1,30 @@
 [sqlfluff]
-dialect = sparksql
+dialect = duckdb
 templater = dbt
-exclude_rules = "L031, L044, L051, L059, L034, L001, L016, L057, L029, L011"
+exclude_rules = AM04, LT05, ST06, RF04, CV03
 
 [sqlfluff:templater:dbt]
 project_dir = ./dbt_transform
 profiles_dir = ./dbt_transform
+target = lint
 
 [sqlfluff:indentation]
-indented_joins = "True"
+indent_unit = space
+tab_space_size = 4
+indented_joins = true
+indented_using_on = true
 
 [sqlfluff:rules:capitalisation.keywords]
 capitalisation_policy = lower
 
 [sqlfluff:rules:capitalisation.identifiers]
 extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+[sqlfluff:rules:aliasing.table]
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.column]
+aliasing = explicit

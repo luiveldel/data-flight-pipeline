@@ -482,15 +482,6 @@ yaml = [
 ]
 
 [[package]]
-name = "appdirs"
-version = "1.4.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d7/d8/05696357e0311f5b5c316d7b95f46c669dd9c15aaeecbb48c7d0aeb88c40/appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41", size = 13470, upload-time = "2020-05-11T07:59:51.037Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/00/2344469e2084fb287c2e0b57b72910309874c3245463acd6cf5e3db69324/appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128", size = 9566, upload-time = "2020-05-11T07:59:49.499Z" },
-]
-
-[[package]]
 name = "appnope"
 version = "0.1.4"
 source = { registry = "https://pypi.org/simple" }
@@ -1177,8 +1168,8 @@ dev = [
     { name = "ipykernel", specifier = "==7.1.0" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-cov", specifier = ">=4.0.0" },
-    { name = "sqlfluff", specifier = "==2.1.1" },
-    { name = "sqlfluff-templater-dbt", specifier = "==2.1.1" },
+    { name = "sqlfluff", specifier = "==4.0.4" },
+    { name = "sqlfluff-templater-dbt", specifier = "==4.0.4" },
 ]
 
 [[package]]
@@ -4327,15 +4318,6 @@ wheels = [
 ]
 
 [[package]]
-name = "ruamel-yaml"
-version = "0.19.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c7/3b/ebda527b56beb90cb7652cb1c7e4f91f48649fbcd8d2eb2fb6e77cd3329b/ruamel_yaml-0.19.1.tar.gz", hash = "sha256:53eb66cd27849eff968ebf8f0bf61f46cdac2da1d1f3576dd4ccee9b25c31993", size = 142709, upload-time = "2026-01-02T16:50:31.84Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/0c/51f6841f1d84f404f92463fc2b1ba0da357ca1e3db6b7fbda26956c3b82a/ruamel_yaml-0.19.1-py3-none-any.whl", hash = "sha256:27592957fedf6e0b62f281e96effd28043345e0e66001f97683aa9a40c667c93", size = 118102, upload-time = "2026-01-02T16:50:29.201Z" },
-]
-
-[[package]]
 name = "s3transfer"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4552,45 +4534,40 @@ wheels = [
 
 [[package]]
 name = "sqlfluff"
-version = "2.1.1"
+version = "4.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "appdirs" },
     { name = "chardet" },
     { name = "click" },
     { name = "colorama" },
     { name = "diff-cover" },
     { name = "jinja2" },
     { name = "pathspec" },
+    { name = "platformdirs" },
     { name = "pytest" },
     { name = "pyyaml" },
     { name = "regex" },
     { name = "tblib" },
-    { name = "toml", marker = "python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "tqdm" },
-    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/12/da/375610053ffff8674dc6689a8404cd3a07d18ef9cf864492e70e3a7f766c/sqlfluff-2.1.1.tar.gz", hash = "sha256:974a2eecb91ab3236b73097ea6c7532a96dd0dcafd4394fa2305b2845ef4d7d2", size = 644536, upload-time = "2023-05-25T16:29:41.341Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/3c/7ec787de79d9ca7bad035ade657473411d2ae59a25c209f86d455035ad91/sqlfluff-4.0.4.tar.gz", hash = "sha256:3f443e18b49ec7062132ae0ef0e2f6e56fc485a2044e9f09ea12a17872efd987", size = 958078, upload-time = "2026-02-09T00:05:29.452Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/93/39/87c1c0e461e29c918a665437f334b907cbff682330515ba380de416cadb4/sqlfluff-2.1.1-py3-none-any.whl", hash = "sha256:7f303189ba3d1e50df5782c0bea974de8a25db0e6d1f0d1238f75b848c8d3f27", size = 675577, upload-time = "2023-05-25T16:29:39.216Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/38/4acc1a5a9e6caf92810b3b09ddf879b78e313e046738dd89523a71682661/sqlfluff-4.0.4-py3-none-any.whl", hash = "sha256:e8b883ec165cb8d08d9f17cca60d831bcc6c193280a13bdc81f9ac84276294c0", size = 954096, upload-time = "2026-02-09T00:05:28.152Z" },
 ]
 
 [[package]]
 name = "sqlfluff-templater-dbt"
-version = "2.1.1"
+version = "4.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dbt-core" },
     { name = "jinja2-simple-tags" },
-    { name = "markupsafe" },
-    { name = "pydantic" },
-    { name = "rich" },
-    { name = "ruamel-yaml" },
     { name = "sqlfluff" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0d/fe/99f54f8fe46fdcdb9de3f2ddc365d1628a400c8366fb765733a7b147e1ce/sqlfluff-templater-dbt-2.1.1.tar.gz", hash = "sha256:566e6eb4bd3831d2bbd20299a1915f85e4b851663c821fbae14b3a736ee008a6", size = 10426, upload-time = "2023-05-25T16:29:45.06Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/f0/28833e2bd771ae5e6778209eec9bac6a1362a36718b2c54c0694764f7c2d/sqlfluff_templater_dbt-4.0.4.tar.gz", hash = "sha256:4ce0a4feebd79b2903377050ecbc78b85af8dbce98259d688f930bc6686539aa", size = 15091, upload-time = "2026-02-09T00:09:52.72Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7a/ab/375773e603fd680648ce5851d21104ec1a8cf0b01b1fe9fdf3d5343a487e/sqlfluff_templater_dbt-2.1.1-py3-none-any.whl", hash = "sha256:27c7807aa13fc137be9f6ee0aa966bec0362b3e584d69f046ce3bc12ad3aaeec", size = 10728, upload-time = "2023-05-25T16:29:43.814Z" },
+    { url = "https://files.pythonhosted.org/packages/52/8e/cc5d1947edffe5d5e6642f38ce27a14eda2821b1f30a7ce9168aed10679a/sqlfluff_templater_dbt-4.0.4-py3-none-any.whl", hash = "sha256:a402285fd0b7acf4d39b635bf4901f9fe31e08734c665fdb09c775a91c33bc27", size = 14760, upload-time = "2026-02-09T00:09:51.579Z" },
 ]
 
 [[package]]
@@ -4691,15 +4668,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fa/fb/5d9ba73be60b32f6fda080a5556cff25e15daf33bafe043c226404b39b25/thrift_sasl-0.4.3.tar.gz", hash = "sha256:5bdd5b760d90a13d9b3abfce873db0425861aa8d6bf25912d3cc0467a4f773da", size = 3962, upload-time = "2021-05-26T12:40:20.875Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c3/9e/636c24ce1c0d46ce3020c5836c5a375d8e862fa81a240e0e352cc991dcf8/thrift_sasl-0.4.3-py2.py3-none-any.whl", hash = "sha256:d24b49140115e6e2a96d08335cff225a27a28ea71866fb1b2bdb30ca5afca64e", size = 8304, upload-time = "2021-05-26T12:40:19.425Z" },
-]
-
-[[package]]
-name = "toml"
-version = "0.10.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253, upload-time = "2020-11-01T01:40:22.204Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588, upload-time = "2020-11-01T01:40:20.672Z" },
 ]
 
 [[package]]

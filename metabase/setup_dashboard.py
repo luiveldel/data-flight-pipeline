@@ -546,6 +546,172 @@ def create_flight_questions(client: MetabaseClient, database_id: int) -> list[di
     questions.append(q12)
     logger.info(f"Created question: {q12['name']}")
 
+    # Question 13: Severe Delay Rate (KPI)
+    q13 = client.create_card({
+        "name": "Severe Delay Rate (%)",
+        "display": "scalar",
+        "dataset_query": {
+            "type": "native",
+            "native": {
+                "query": """
+                    SELECT 
+                        ROUND(SUM(CASE WHEN delay_category = 'severe_delay' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) as severe_pct
+                    FROM fct_flights
+                """,
+            },
+            "database": database_id,
+        },
+        "visualization_settings": {
+            "scalar.suffix": "%",
+        },
+    })
+    questions.append(q13)
+    logger.info(f"Created question: {q13['name']}")
+
+    # Question 14: Delay Heatmap (Hour x Day)
+    q14 = client.create_card({
+        "name": "Delay Heatmap by Hour & Day",
+        "display": "table",
+        "dataset_query": {
+            "type": "native",
+            "native": {
+                "query": """
+                    SELECT 
+                        day_of_week_name as Day,
+                        dep_hour as Hour,
+                        avg_delay_min as "Avg Delay (min)",
+                        total_flights as Flights,
+                        delayed_pct as "Delayed %"
+                    FROM delay_heatmap
+                    ORDER BY day_of_week, dep_hour
+                """,
+            },
+            "database": database_id,
+        },
+        "visualization_settings": {
+            "table.pivot": True,
+            "table.pivot_column": "Hour",
+            "table.cell_column": "Avg Delay (min)",
+        },
+    })
+    questions.append(q14)
+    logger.info(f"Created question: {q14['name']}")
+
+    # Question 15: Delay Category Trend (Stacked Area)
+    q15 = client.create_card({
+        "name": "Delay Categories Over Time",
+        "display": "area",
+        "dataset_query": {
+            "type": "native",
+            "native": {
+                "query": """
+                    SELECT 
+                        flight_date,
+                        delay_category,
+                        COUNT(*) as count
+                    FROM fct_flights
+                    GROUP BY flight_date, delay_category
+                    ORDER BY flight_date, delay_category
+                """,
+            },
+            "database": database_id,
+        },
+        "visualization_settings": {
+            "stackable.stack_type": "stacked",
+            "graph.x_axis.title_text": "Date",
+            "graph.y_axis.title_text": "Flights",
+        },
+    })
+    questions.append(q15)
+    logger.info(f"Created question: {q15['name']}")
+
+    # Question 16: Top Routes Table with Metrics
+    q16 = client.create_card({
+        "name": "Top Routes Performance Table",
+        "display": "table",
+        "dataset_query": {
+            "type": "native",
+            "native": {
+                "query": """
+                    SELECT 
+                        route as Route,
+                        SUM(total_flights) as "Total Flights",
+                        ROUND(AVG(avg_dep_delay_min), 1) as "Avg Delay (min)",
+                        ROUND(100 - AVG(delayed_pct), 1) as "On-Time %",
+                        ROUND(AVG(delayed_pct), 1) as "Delayed %"
+                    FROM fct_route_daily
+                    GROUP BY route
+                    HAVING SUM(total_flights) >= 3
+                    ORDER BY SUM(total_flights) DESC
+                    LIMIT 15
+                """,
+            },
+            "database": database_id,
+        },
+        "visualization_settings": {
+            "table.column_formatting": [
+                {"columns": ["On-Time %"], "type": "range", "colors": ["#EF8C8C", "#F9D45C", "#84BB4C"]},
+                {"columns": ["Delayed %"], "type": "range", "colors": ["#84BB4C", "#F9D45C", "#EF8C8C"]},
+            ],
+        },
+    })
+    questions.append(q16)
+    logger.info(f"Created question: {q16['name']}")
+
+    # Question 17: Weekly Comparison
+    q17 = client.create_card({
+        "name": "Weekly Performance Trend",
+        "display": "combo",
+        "dataset_query": {
+            "type": "native",
+            "native": {
+                "query": """
+                    SELECT 
+                        week_start as Week,
+                        total_flights as Flights,
+                        avg_delay_min as "Avg Delay",
+                        ontime_pct as "On-Time %"
+                    FROM weekly_comparison
+                    ORDER BY week_start
+                """,
+            },
+            "database": database_id,
+        },
+        "visualization_settings": {
+            "graph.x_axis.title_text": "Week",
+            "series_settings": {
+                "Flights": {"display": "bar"},
+                "Avg Delay": {"display": "line"},
+                "On-Time %": {"display": "line"},
+            },
+        },
+    })
+    questions.append(q17)
+    logger.info(f"Created question: {q17['name']}")
+
+    # Question 18: Most Delayed Route (KPI)
+    q18 = client.create_card({
+        "name": "Most Delayed Route",
+        "display": "scalar",
+        "dataset_query": {
+            "type": "native",
+            "native": {
+                "query": """
+                    SELECT route
+                    FROM fct_route_daily
+                    GROUP BY route
+                    HAVING SUM(total_flights) >= 3
+                    ORDER BY AVG(delayed_pct) DESC
+                    LIMIT 1
+                """,
+            },
+            "database": database_id,
+        },
+        "visualization_settings": {},
+    })
+    questions.append(q18)
+    logger.info(f"Created question: {q18['name']}")
+
     return questions
 
 
@@ -566,6 +732,12 @@ def cleanup_flight_analytics(client: MetabaseClient) -> None:
         "Average Delay (min)",
         "Flights by Departure Hour",
         "Top 10 Departure Airports",
+        "Severe Delay Rate (%)",
+        "Delay Heatmap by Hour & Day",
+        "Delay Categories Over Time",
+        "Top Routes Performance Table",
+        "Weekly Performance Trend",
+        "Most Delayed Route",
     ]
 
     # Delete dashboards with matching name
@@ -602,7 +774,7 @@ def create_dashboard_with_cards(
     """Create a dashboard and add all questions to it."""
     dashboard = client.create_dashboard(
         name="Flight Analytics Dashboard",
-        description="Real-time flight performance metrics and analytics. Data sourced from AviationStack API and transformed using dbt.",
+        description="Professional flight performance analytics dashboard. Features KPIs, temporal analysis, route performance, and week-over-week trends. Data sourced from AviationStack API, processed with PySpark, and transformed using dbt.",
     )
     dashboard_id = dashboard["id"]
     logger.info(f"Created dashboard: {dashboard['name']} (ID: {dashboard_id})")
@@ -613,29 +785,39 @@ def create_dashboard_with_cards(
     # Row 3+: Additional charts
     
     layout = [
-        # KPIs at the top (row 0)
-        {"name": "Total Flights", "row": 0, "col": 0, "size_x": 4, "size_y": 3},
-        {"name": "On-Time Rate (%)", "row": 0, "col": 4, "size_x": 4, "size_y": 3},
-        {"name": "Average Delay (min)", "row": 0, "col": 8, "size_x": 4, "size_y": 3},
+        # ROW 0: KPIs (5 cards across the top)
+        {"name": "Total Flights", "row": 0, "col": 0, "size_x": 3, "size_y": 3},
+        {"name": "On-Time Rate (%)", "row": 0, "col": 3, "size_x": 3, "size_y": 3},
+        {"name": "Average Delay (min)", "row": 0, "col": 6, "size_x": 2, "size_y": 3},
+        {"name": "Severe Delay Rate (%)", "row": 0, "col": 8, "size_x": 2, "size_y": 3},
+        {"name": "Most Delayed Route", "row": 0, "col": 10, "size_x": 2, "size_y": 3},
         
-        # Main trend charts (row 3)
+        # ROW 3: Main trend chart (full width)
         {"name": "Total Flights by Date", "row": 3, "col": 0, "size_x": 12, "size_y": 5},
         
-        # Delay analysis (row 8)
-        {"name": "Daily Average Delay Trend", "row": 8, "col": 0, "size_x": 8, "size_y": 5},
+        # ROW 8: Delay analysis
+        {"name": "Delay Categories Over Time", "row": 8, "col": 0, "size_x": 8, "size_y": 5},
         {"name": "Delay Category Distribution", "row": 8, "col": 8, "size_x": 4, "size_y": 5},
         
-        # Time analysis (row 13)
-        {"name": "Average Delay by Time of Day", "row": 13, "col": 0, "size_x": 6, "size_y": 5},
-        {"name": "Flights by Departure Hour", "row": 13, "col": 6, "size_x": 6, "size_y": 5},
+        # ROW 13: Temporal analysis
+        {"name": "Delay Heatmap by Hour & Day", "row": 13, "col": 0, "size_x": 6, "size_y": 6},
+        {"name": "Flights by Departure Hour", "row": 13, "col": 6, "size_x": 6, "size_y": 6},
         
-        # Route and airline analysis (row 18)
-        {"name": "Top 10 Routes by Delay Percentage", "row": 18, "col": 0, "size_x": 6, "size_y": 5},
-        {"name": "Flights by Airline", "row": 18, "col": 6, "size_x": 6, "size_y": 5},
+        # ROW 19: Weekly trends
+        {"name": "Weekly Performance Trend", "row": 19, "col": 0, "size_x": 12, "size_y": 5},
         
-        # Additional metrics (row 23)
-        {"name": "Top 10 Departure Airports", "row": 23, "col": 0, "size_x": 6, "size_y": 5},
-        {"name": "Weekend vs Weekday Performance", "row": 23, "col": 6, "size_x": 6, "size_y": 5},
+        # ROW 24: Routes and Airlines
+        {"name": "Top Routes Performance Table", "row": 24, "col": 0, "size_x": 6, "size_y": 6},
+        {"name": "Flights by Airline", "row": 24, "col": 6, "size_x": 6, "size_y": 6},
+        
+        # ROW 30: Additional metrics
+        {"name": "Top 10 Departure Airports", "row": 30, "col": 0, "size_x": 4, "size_y": 5},
+        {"name": "Average Delay by Time of Day", "row": 30, "col": 4, "size_x": 4, "size_y": 5},
+        {"name": "Weekend vs Weekday Performance", "row": 30, "col": 8, "size_x": 4, "size_y": 5},
+        
+        # ROW 35: Deep dive
+        {"name": "Daily Average Delay Trend", "row": 35, "col": 0, "size_x": 6, "size_y": 5},
+        {"name": "Top 10 Routes by Delay Percentage", "row": 35, "col": 6, "size_x": 6, "size_y": 5},
     ]
 
     # Map question names to IDs

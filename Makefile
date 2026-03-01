@@ -62,3 +62,7 @@ test:
 .PHONY: lint
 lint:
 	uv run sqlfluff lint dbt_transform/models/
+
+.PHONY: lint/fix
+lint/fix:
+	uv run sqlfluff fix dbt_transform/models/

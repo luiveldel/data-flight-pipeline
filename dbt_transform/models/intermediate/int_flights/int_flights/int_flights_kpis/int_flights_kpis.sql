@@ -6,7 +6,7 @@ select
     *,
     date_part('dow', flight_date) as day_of_week,
     dayname(flight_date) as day_of_week_name,
-    case when date_part('dow', flight_date) in (0, 6) then true else false end as is_weekend,
+    coalesce(date_part('dow', flight_date) in (0, 6), false) as is_weekend,
     date_part('hour', dep_scheduled) as dep_hour,
     case
         when date_part('hour', dep_scheduled) between 5 and 11 then 'Morning'
@@ -25,6 +25,6 @@ select
         when dep_delay_min <= -15 then 'early'
         else 'ontime'
     end as delay_category,
-    case when dep_delay_min > 15 then true else false end as is_delayed_15,
+    coalesce(dep_delay_min > 15, false) as is_delayed_15,
     dep_delay_min as avg_delay
 from stg_lnd_flights
