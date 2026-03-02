@@ -79,3 +79,19 @@ prod/down:
 .PHONY: prod/logs
 prod/logs:
 	docker compose -f docker-compose.prod.yaml logs -f
+
+# Setup Metabase dashboard (DuckDB + visualizations). Requires Metabase admin credentials.
+.PHONY: prod/setup
+prod/setup:
+	@echo "Setting up Metabase dashboard for production..."
+	@echo "Usage: make prod/setup EMAIL=tu@email.com PASSWORD=tucontraseña"
+	@if [ -z "$(EMAIL)" ] || [ -z "$(PASSWORD)" ]; then \
+		echo "Error: EMAIL and PASSWORD are required"; \
+		echo "Example: make prod/setup EMAIL=admin@example.com PASSWORD=admin123"; \
+		exit 1; \
+	fi
+	python3 metabase/setup_dashboard.py \
+		--url http://localhost:3000 \
+		--email $(EMAIL) \
+		--password $(PASSWORD) \
+		--duckdb-path /data/analytics.duckdb

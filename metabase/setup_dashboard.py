@@ -84,8 +84,8 @@ class MetabaseClient:
             "name": name,
             "details": {
                 "database_file": path,
-                # Additional settings that may be required
-                "motherduck_token": "",  # Empty for local files
+                "read_only": True,
+                "old_implicit_casting": True,  # Required for datetime filtering
             },
             "is_full_sync": True,
             "is_on_demand": False,
