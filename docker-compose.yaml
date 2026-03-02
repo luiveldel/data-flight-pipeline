@@ -47,7 +47,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./include:/opt/airflow/include
     - ./spark_jobs:/opt/airflow/spark_jobs
-    - ./logs:/opt/airflow/logs
+    - airflow-logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ./config:/opt/airflow/config
     - ./dbt_transform:/opt/airflow/dbt_transform
@@ -177,6 +177,9 @@ services:
     command: webserver
     ports:
       - "8080:8080"
+    networks:
+      - default
+      - web_proxy
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -200,7 +203,8 @@ services:
     command: >
       bash -c "mkdir -p /opt/airflow/data/raw &&
               chown -R ${AIRFLOW_UID:-50000}:0 /opt/airflow/data &&
-              airflow version"
+              airflow version &&
+              /opt/airflow/config/setup_connections.sh"
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
@@ -222,11 +226,19 @@ services:
       - metabase-data:/metabase-data
       - ./data:/data
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     restart: unless-stopped
+    networks:
+      - default
+      - web_proxy
+
+networks:
+  web_proxy:
+    external: true
 
 volumes:
   airflow-uv-venv:
+  airflow-logs:
   postgres-db-volume:
   minio-data:
   metabase-data:

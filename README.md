@@ -117,6 +117,8 @@ make dbt/run            # Transform data
 make metabase/setup-dashboard EMAIL=... PASSWORD=...
 ```
 
+The `airflow-init` container automatically creates the `aws_default` connection for MinIO (S3-compatible) using credentials from `.env`. See `config/setup_connections.sh`.
+
 Access:
 - Airflow: http://localhost:8080
 - Metabase: http://localhost:3000
