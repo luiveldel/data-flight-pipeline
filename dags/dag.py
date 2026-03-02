@@ -170,7 +170,7 @@ def dag_() -> None:
     verify_raw_flights = S3KeySensor(
         task_id="verify_raw_flights_uploaded",
         bucket_name=S3_BUCKET,
-        bucket_key=f"raw/insert_date={EXECUTION_DATE}/",
+        bucket_key=f"raw/insert_date={EXECUTION_DATE}/*",
         wildcard_match=True,
         aws_conn_id=AWS_CONN_ID,
         poke_interval=30,
@@ -181,7 +181,7 @@ def dag_() -> None:
     verify_raw_openflights = S3KeySensor(
         task_id="verify_raw_openflights_uploaded",
         bucket_name=S3_BUCKET,
-        bucket_key="raw/openflights/",
+        bucket_key="raw/openflights/*",
         wildcard_match=True,
         aws_conn_id=AWS_CONN_ID,
         poke_interval=30,
@@ -227,7 +227,7 @@ def dag_() -> None:
     verify_bronze_data = S3KeySensor(
         task_id="verify_bronze_data",
         bucket_name=S3_BUCKET,
-        bucket_key=f"bronze/insert_date={EXECUTION_DATE}/",
+        bucket_key=f"bronze/insert_date={EXECUTION_DATE}/*",
         wildcard_match=True,
         aws_conn_id=AWS_CONN_ID,
         poke_interval=30,
