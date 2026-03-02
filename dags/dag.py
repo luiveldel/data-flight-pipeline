@@ -246,7 +246,7 @@ def dag_() -> None:
     stop_metabase = BashOperator(
         task_id="stop_metabase",
         bash_command="curl -sSf --unix-socket /var/run/docker.sock -X POST "
-        '"http://localhost/v1.41/containers/metabase/stop?t=30" && sleep 5',
+        '"http://localhost/v1.44/containers/metabase/stop?t=30" && sleep 5',
     )
 
     dbt_transform = BashOperator(
@@ -259,7 +259,7 @@ def dag_() -> None:
     start_metabase = BashOperator(
         task_id="start_metabase",
         bash_command="curl -sSf --unix-socket /var/run/docker.sock -X POST "
-        '"http://localhost/v1.41/containers/metabase/start" || true',
+        '"http://localhost/v1.44/containers/metabase/start" || true',
         trigger_rule="all_done",
     )
 
