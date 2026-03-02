@@ -1,14 +1,21 @@
 version: 2
 
+# Sources point to Parquet files in MinIO (S3-compatible).
 sources:
   - name: flights_raw
     tables:
       - name: lnd_flights
+        identifier: "s3://flights-data-lake/bronze/insert_date={{ var('execution_date') }}/"
 
   - name: openflights_raw
     tables:
       - name: lnd_airlines
+        identifier: s3://flights-data-lake/bronze/openflights/airlines.parquet
       - name: lnd_airports
+        identifier: s3://flights-data-lake/bronze/openflights/airports.parquet
       - name: lnd_routes
+        identifier: s3://flights-data-lake/bronze/openflights/routes.parquet
       - name: lnd_planes
+        identifier: s3://flights-data-lake/bronze/openflights/planes.parquet
       - name: lnd_countries
+        identifier: s3://flights-data-lake/bronze/openflights/countries.parquet

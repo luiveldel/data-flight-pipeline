@@ -52,7 +52,10 @@ x-airflow-common:
     - ./config:/opt/airflow/config
     - ./dbt_transform:/opt/airflow/dbt_transform
     - data_volume:/opt/airflow/data
+    - /var/run/docker.sock:/var/run/docker.sock
   user: "${AIRFLOW_UID}:0"
+  group_add:
+    - "${DOCKER_GID:-999}"
   depends_on:
     &airflow-common-depends-on
     postgres:
@@ -203,6 +206,8 @@ services:
     command: >
       bash -c "mkdir -p /opt/airflow/data/raw &&
               chown -R ${AIRFLOW_UID:-50000}:0 /opt/airflow/data &&
+              mkdir -p /opt/airflow/dbt_transform/dbt_packages &&
+              chown -R ${AIRFLOW_UID:-50000}:0 /opt/airflow/dbt_transform &&
               airflow version &&
               /opt/airflow/config/setup_connections.sh"
     environment:

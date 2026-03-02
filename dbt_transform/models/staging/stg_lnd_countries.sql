@@ -5,7 +5,7 @@
 }}
 
 with source as (
-    select * from {{ source('openflights_raw', 'lnd_countries') }}
+    select * from read_parquet('s3://flights-data-lake/bronze/openflights/countries.parquet/*.parquet')
 )
 
 select

@@ -5,7 +5,7 @@
 }}
 
 with source as (
-    select * from {{ source("flights_raw", "lnd_flights") }}
+    select * from read_parquet('s3://flights-data-lake/bronze/insert_date={{ var("execution_date") }}/' || '*.parquet')
 )
 
 select

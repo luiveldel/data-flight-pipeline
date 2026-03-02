@@ -11,6 +11,7 @@ with int_flights as (
 
 select
     '{{ var("execution_date") }}'::date as insert_date_ci,
+    flight_key,
     flight_iata_full,
     flight_number,
     airline_iata,

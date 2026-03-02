@@ -15,7 +15,9 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-# Set JAVA_HOME
+# Set JAVA_HOME - create symlink so path works on both arm64 and amd64
+RUN JAVA_REAL=$(ls -d /usr/lib/jvm/java-17-openjdk-* 2>/dev/null | head -1) && \
+    ln -sf "$JAVA_REAL" /usr/lib/jvm/java-17-openjdk-amd64
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 

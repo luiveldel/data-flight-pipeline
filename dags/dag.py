@@ -199,7 +199,7 @@ def dag_() -> None:
             task_id=f"etl_{etl_name}",
             bash_command=f"""
                 /opt/airflow/.venv/bin/spark-submit \
-                --master {SPARK_MASTER_URL} \
+                --master local[4] \
                 --total-executor-cores {SPARK_EXECUTOR_CORES} \
                 --executor-memory {SPARK_EXECUTOR_MEMORY} \
                 --conf spark.hadoop.fs.s3a.endpoint={MINIO_ENDPOINT} \
@@ -242,10 +242,25 @@ def dag_() -> None:
         }
     )
 
+    # Stop Metabase before dbt to release DuckDB lock (analytics.duckdb)
+    stop_metabase = BashOperator(
+        task_id="stop_metabase",
+        bash_command="curl -sSf --unix-socket /var/run/docker.sock -X POST "
+        '"http://localhost/v1.41/containers/metabase/stop?t=30" && sleep 5',
+    )
+
     dbt_transform = BashOperator(
         task_id="dbt_transform",
         bash_command=f"cd /opt/airflow/dbt_transform && \
-            dbt run --vars {dbt_vars}",
+            dbt deps && dbt run --vars {dbt_vars}",
+    )
+
+    # Start Metabase after dbt (runs even if dbt fails)
+    start_metabase = BashOperator(
+        task_id="start_metabase",
+        bash_command="curl -sSf --unix-socket /var/run/docker.sock -X POST "
+        '"http://localhost/v1.41/containers/metabase/start" || true',
+        trigger_rule="all_done",
     )
 
     @task(task_id="validate_dbt_output")
@@ -275,7 +290,9 @@ def dag_() -> None:
         >> [verify_raw_flights, verify_raw_openflights]
         >> etl_bronze()
         >> verify_bronze_data
+        >> stop_metabase
         >> dbt_transform
+        >> start_metabase
         >> validate_dbt_output()
         >> end
     )

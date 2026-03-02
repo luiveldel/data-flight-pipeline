@@ -28,3 +28,4 @@ avg_delayed_pct as (
         round(delayed_pct, 2) as delayed_pct
     from agg
 )
+select * from avg_delayed_pct
