@@ -4,8 +4,8 @@
     )
 }}
 
-with int_flights as (
-    select * from {{ ref('int_flights') }}
+with fct_flights as (
+    select * from {{ ref('fct_flights') }}
 ),
 
 get_avg_metrics as (
@@ -18,7 +18,7 @@ get_avg_metrics as (
         round(avg(arr_delay_min), 2) as avg_arr_delay_min,
         sum(case when is_delayed_15 then 1 else 0 end) as delayed_flights,
         round(sum(case when is_delayed_15 then 1 else 0 end) * 100.0 / count(*), 2) as delayed_pct
-    from int_flights
+    from fct_flights
     where dep_hour is not null
     group by 1, 2, 3
     order by 1, 3

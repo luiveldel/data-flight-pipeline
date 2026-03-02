@@ -1,5 +1,5 @@
-with int_flights as (
-    select * from {{ ref('int_flights') }}
+with fct_flights as (
+    select * from {{ ref('fct_flights') }}
 ),
 
 get_weekly_metrics as (
@@ -18,7 +18,7 @@ get_weekly_metrics as (
             sum(case when delay_category = 'severe_delay' then 1 else 0 end) * 100.0 / count(*),
             2
         ) as severe_pct
-    from int_flights
+    from fct_flights
     group by 1
 ),
 

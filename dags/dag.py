@@ -104,7 +104,7 @@ DEFAULT_ARGS = {
 @dag(
     DAG_NAME,
     start_date=datetime(2025, 12, 21),
-    catchup=False,
+    catchup=True,
     schedule_interval="0 0 * * *",
     default_args=DEFAULT_ARGS,
     tags=["spark", "minio", "aviationstack", "etl"],

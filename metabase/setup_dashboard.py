@@ -496,6 +496,8 @@ def create_flight_questions(client: MetabaseClient, database_id: int) -> list[di
     logger.info(f"Created question: {q10['name']}")
 
     # Question 11: Flights by Hour
+    # Cast dep_hour to INTEGER: DuckDB's date_part returns DOUBLE, which can cause
+    # Metabase bar charts to fail or display incorrectly
     q11 = client.create_card({
         "name": "Flights by Departure Hour",
         "display": "bar",
@@ -504,12 +506,12 @@ def create_flight_questions(client: MetabaseClient, database_id: int) -> list[di
             "native": {
                 "query": """
                     SELECT 
-                        dep_hour,
+                        CAST(dep_hour AS INTEGER) as hour,
                         COUNT(*) as flights
                     FROM fct_flights
                     WHERE dep_hour IS NOT NULL
-                    GROUP BY dep_hour
-                    ORDER BY dep_hour
+                    GROUP BY CAST(dep_hour AS INTEGER)
+                    ORDER BY hour
                 """,
             },
             "database": database_id,

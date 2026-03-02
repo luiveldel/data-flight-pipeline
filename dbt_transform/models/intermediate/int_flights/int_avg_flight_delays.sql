@@ -1,5 +1,5 @@
-with int_flights as (
-    select * from {{ ref('int_flights') }}
+with fct_flights as (
+    select * from {{ ref('fct_flights') }}
 ),
 
 agg as (
@@ -12,7 +12,7 @@ agg as (
         count(*) as total_flights,
         avg(dep_delay_min) as avg_dep_delay_min,
         sum(case when delay_category in ('moderate_delay', 'severe_delay') then 1 else 0 end) * 100.0 / count(*) as delayed_pct
-    from int_flights
+    from fct_flights
     group by 1, 2, 3, 4, 5
 ),
 
