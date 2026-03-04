@@ -227,6 +227,8 @@ services:
     environment:
       MB_PLUGINS_DIR: /metabase/plugins
       MB_DB_FILE: /metabase-data/metabase.db
+      # Allow embedding from CV site (no UI option in newer Metabase)
+      MB_EMBEDDING_APP_ORIGIN: ${MB_EMBEDDING_APP_ORIGIN:-https://cv.luisandresvelazquez.com}
     volumes:
       - metabase-data:/metabase-data
       - ./data:/data
